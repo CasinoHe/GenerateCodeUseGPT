@@ -1,3 +1,6 @@
 __pycache__
 .vscode
 .vs
+
+# ignore conf.json because it contains sensitive information
+conf.json
