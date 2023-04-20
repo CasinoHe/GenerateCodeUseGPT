@@ -48,7 +48,7 @@ class OpenAIUtil(object):
             self.mutex.acquire()
             self.model_list = model_list
             # save the models name to self.model_name_list
-            self.model_name_list = [model['id'] for model in model_list['data']]
+            self.model_name_list = [model['id'] for model in model_list['data']] # type: ignore
             # put the 'gpt-3.5-turbo' the first element in the list
             if 'gpt-3.5-turbo' in self.model_name_list:
                 self.model_name_list.remove('gpt-3.5-turbo')
@@ -118,11 +118,11 @@ class OpenAIUtil(object):
 
             for chunk in response:
                 # if the response is completed, we need to notify the main thread
-                if chunk['choices'][0]['finish_reason'] == 'stop':
+                if chunk['choices'][0]['finish_reason'] == 'stop': # type: ignore
                     callback('')
                     return
 
-                chunk_message = chunk['choices'][0]['delta'].get('content', '')
+                chunk_message = chunk['choices'][0]['delta'].get('content', '') # type: ignore
 
                 # if the chunk is empty, we need to continue
                 if not chunk_message:
