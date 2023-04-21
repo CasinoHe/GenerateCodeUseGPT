@@ -50,8 +50,10 @@ class GenerateCodeDialog(QDialog):
         self.ui.tabWidgetExamples.removeTab(1)
         self.ui.tabWidgetExamples.removeTab(0)
 
+        # lambda callback function to call onSelectedExampleFile
+        open_example_callback = lambda: self.onSelectedExampleFile()
         # then, add example tabs
-        self.example_tabs.append(example_tab.ExampleTab(self))
+        self.example_tabs.append(example_tab.ExampleTab(open_example_callback, self))
         self.ui.tabWidgetExamples.addTab(self.example_tabs[0], "Example {}".format(len(self.example_tabs)))
 
         # connect signals and slots
@@ -109,12 +111,12 @@ class GenerateCodeDialog(QDialog):
             self.ui.pushButtonRefreshPrompt.setEnabled(True)
 
             # read file content and show it in PlainTextEdit
-            with open(prompt_file, "r") as f:
+            with open(prompt_file, "r", encoding='utf-8') as f:
                 self.ui.plainTextEditPrompt.setPlainText(f.read())
 
     def clickRefreshPrompt(self):
         # read file content and show it in PlainTextEdit
-        with open(self.ui.lineEditPrompt.text(), "r") as f:
+        with open(self.ui.lineEditPrompt.text(), "r", encoding='utf-8') as f:
             self.ui.plainTextEditPrompt.setPlainText(f.read())
 
     def clickClearPrompt(self):

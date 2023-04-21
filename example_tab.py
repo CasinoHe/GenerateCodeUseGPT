@@ -9,12 +9,13 @@ class ExampleTab(QWidget):
     '''
     ExampleTab is a widget that provide convinient way to select example file
     '''
-    def __init__(self, parent=None):
+    def __init__(self, callback, parent=None):
         super(ExampleTab, self).__init__(parent)
 
         # init ui
         self.ui = example_tab_ui.Ui_TabWidget()
         self.ui.setupUi(self)
+        self.open_example_callback = callback
         self.initUI()
 
     def initUI(self):
@@ -39,8 +40,9 @@ class ExampleTab(QWidget):
         self.ui.pushButtonRefresh.setEnabled(True)
 
         # read file content to plainTextEdit and refresh it
-        with open(filepath[0], "r") as f:
+        with open(filepath[0], "r", encoding='utf-8') as f:
             self.ui.plainTextEdit.setPlainText(f.read())
+        self.open_example_callback()
 
     def clickRefreshExample(self):
         if len(self.ui.lineEditExample.text()) <= 0:
@@ -48,7 +50,7 @@ class ExampleTab(QWidget):
             QMessageBox.warning(self, "Warning", "Please select a file first")
             return
         # read file content to plainTextEdit and refresh it
-        with open(self.ui.lineEditExample.text(), "r") as f:
+        with open(self.ui.lineEditExample.text(), "r", encoding='utf-8') as f:
             self.ui.plainTextEdit.setPlainText(f.read())
 
     def getExampleContent(self):
