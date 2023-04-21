@@ -11,6 +11,7 @@ from PyQt6 import uic
 from ui import generate_dialog_ui
 import threading
 import example_tab
+import json
 
 class GenerateCodeDialog(QDialog):
     '''
@@ -60,12 +61,25 @@ class GenerateCodeDialog(QDialog):
         self.ui.pushButtonNewExample.clicked.connect(self.clickAddExampleTab)
         # connect delete button
         self.ui.pushButtonDeleteExample.clicked.connect(self.clickDeleteExampleTab)
+        # connect clear example button
+        self.ui.pushButtonClearExample.clicked.connect(self.clickClearExampleTab)
 
         # disable new example button first, because there is no file selected
         self.ui.pushButtonNewExample.setEnabled(False)
 
+    def clickClearExampleTab(self):
+        # get active tab index
+        tab_index = self.ui.tabWidgetExamples.currentIndex()
+        # if tab_index is not 0, or there is other tab exist, do not clear
+        if tab_index != 0 or len(self.example_tabs) > 1:
+            QMessageBox.warning(self, "Warning", "Please delete the tab first")
+            return
+        self.example_tabs[tab_index].clear()
+
     def clickAddExampleTab(self):
-        self.example_tabs.append(example_tab.ExampleTab(self))
+        # lambda callback function to call onSelectedExampleFile
+        open_example_callback = lambda: self.onSelectedExampleFile()
+        self.example_tabs.append(example_tab.ExampleTab(open_example_callback, self))
         self.ui.tabWidgetExamples.addTab(self.example_tabs[-1], "Example {}".format(len(self.example_tabs)))
         # change tab to the new tab
         self.ui.tabWidgetExamples.setCurrentIndex(len(self.example_tabs) - 1)
@@ -127,6 +141,8 @@ class GenerateCodeDialog(QDialog):
         self.ui.pushButtonGenerateResult.clicked.connect(self.clickGenerateResult)
         # connect save info button
         self.ui.pushButtonSaveQueryInfo.clicked.connect(self.clickSaveInfo)
+        # connect load info button
+        self.ui.pushButtonLoadQueryInfo.clicked.connect(self.clickLoadInfo)
         # connect copy result button
         self.ui.pushButtonCopyResult.clicked.connect(self.clickCopyResult)
 
@@ -175,7 +191,111 @@ class GenerateCodeDialog(QDialog):
 
         # get parameters
         save_info = {}
-        return
+
+        # build example info
+        example_info = []
+        self._packExampleInfo(example_info)
+        prompt_info = {}
+        self._packPromptInfo(prompt_info)
+        generate_info = {}
+        self._packGenerateInfo(generate_info)
+
+        save_info["examples"] = example_info
+        save_info["prompt"] = prompt_info
+        save_info["generate"] = generate_info
+
+        # if there is result, then save the result
+        result = self.ui.plainTextEditResult.toPlainText()
+        if result: 
+            save_info["result"] = result
+
+        # save to file
+        with open(save_file, "w", encoding='utf-8') as f:
+            json.dump(save_info, f, indent=4)
+
+    def _packExampleInfo(self, example_info):
+        # get examples's content
+        for example_tab in self.example_tabs:
+            single_exmaple_info = {
+                "file": example_tab.getExampleFile(),
+                "content": example_tab.getExampleContent()
+            }
+            example_info.append(single_exmaple_info)
+    
+    def _packPromptInfo(self, prompt_info):
+        # get prompt
+        prompt = self.ui.plainTextEditPrompt.toPlainText()
+        prompt_file = self.ui.lineEditPrompt.text()
+        prompt_info["file"] = prompt_file
+        prompt_info["content"] = prompt
+
+    def _packGenerateInfo(self, generate_info):
+        # get model
+        model = self.ui.comboBoxModel.currentText()
+        # get temperature
+        temperature = self.ui.doubleSpinBoxTemperature.value()
+        generate_info["model"] = model
+        generate_info["temperature"] = temperature
+
+    def clickLoadInfo(self):
+        '''load all info from a json file'''
+        # open a file dialog to select a file
+        load_file, _ = QFileDialog.getOpenFileName(self, "Load Query Info", "", "Json Files (*.json)")
+        if not load_file:
+            return
+
+        # load json file
+        with open(load_file, "r", encoding='utf-8') as f:
+            load_info = json.load(f)
+
+        # set parameters
+        example_info = load_info["examples"]
+        self._unpackExampleInfo(example_info)
+
+        prompt_info = load_info["prompt"]
+        self._unpackPromptInfo(prompt_info)
+
+        generate_info = load_info["generate"]
+        self._unpackGenerateInfo(generate_info)
+
+        result_info = load_info.get("result", None)
+        if result_info:
+            self._unpackResultInfo(result_info)
+
+    def _unpackExampleInfo(self, exmaple_info):
+        # load example info from a json file
+        # first, set example tab data
+        for index in range(len(exmaple_info)):
+            if index >= len(self.example_tabs):
+                self.clickAddExampleTab()
+            self.example_tabs[index].setExampleFile(exmaple_info[index]["file"])
+            self.example_tabs[index].setExampleContent(exmaple_info[index]["content"])
+        # second, remove extra example tab
+        for index in range(len(exmaple_info), len(self.example_tabs)):
+            self.clickDeleteExampleTab()
+
+    def _unpackPromptInfo(self, prompt_info):
+        # load prompt info from a json file
+        self.ui.lineEditPrompt.setText(prompt_info["file"])
+        self.ui.plainTextEditPrompt.setPlainText(prompt_info["content"])
+
+    def _unpackGenerateInfo(self, generate_info):
+        # load generate info from a json file
+        model = generate_info["model"]
+        temperature = generate_info["temperature"]
+        self.ui.doubleSpinBoxTemperature.setValue(temperature)
+
+        # because there are already some models in combobox, so we need to find the model index
+        model_index = self.ui.comboBoxModel.findText(model)
+        if model_index != -1:
+            self.ui.comboBoxModel.setCurrentIndex(model_index)
+        else:
+            # insert the model as the first item
+            self.ui.comboBoxModel.insertItem(0, model)
+
+    def _unpackResultInfo(self, result_info):
+        # load result info from a json file
+        self.ui.plainTextEditResult.setPlainText(result_info)
 
     def clickGenerateResult(self):
         # get parameters

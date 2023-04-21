@@ -55,3 +55,17 @@ class ExampleTab(QWidget):
 
     def getExampleContent(self):
         return self.ui.plainTextEdit.toPlainText()
+
+    def getExampleFile(self):
+        return self.ui.lineEditExample.text()
+
+    def setExampleFile(self, filepath):
+        self.ui.lineEditExample.setText(filepath)
+
+    def setExampleContent(self, content):
+        self.ui.plainTextEdit.setPlainText(content)
+
+    def clear(self):
+        # clear lineEdit and plainTextEdit
+        self.ui.lineEditExample.clear()
+        self.ui.plainTextEdit.clear()
