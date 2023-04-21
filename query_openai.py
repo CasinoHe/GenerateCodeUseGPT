@@ -118,7 +118,8 @@ class OpenAIUtil(object):
 
             for chunk in response:
                 # if the response is completed, we need to notify the main thread
-                if chunk['choices'][0]['finish_reason'] == 'stop': # type: ignore
+                if chunk['choices'][0]['finish_reason'] in ['stop', 'max_tokens', 'timeout', 'length', 'api_call_error']: # type: ignore
+                    print("response completed, the result is :{}".format(chunk['choices'][0]['finish_reason'])) # type: ignore
                     callback('')
                     return
 

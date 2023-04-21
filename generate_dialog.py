@@ -368,9 +368,9 @@ class GenerateCodeDialog(QDialog):
         # if result index is not equal to result content length, we append result
         self.result_update_mutex.acquire()
         if self.result_index != len(self.result_content) - 1:
-            self.result_index += 1
             for i in range(self.result_index, len(self.result_content)):
                 self.appendResult(self.result_content[i])
+                self.result_index += 1
         if self.result_completed:
             self.onGenerateResultCompleted()
         self.result_update_mutex.release()
