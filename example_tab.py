@@ -65,7 +65,20 @@ class ExampleTab(QWidget):
     def setExampleContent(self, content):
         self.ui.plainTextEdit.setPlainText(content)
 
+    def getExampleDesc(self):
+        return self.ui.plainTextEditExampleDesc.toPlainText()
+
+    def setExampleDesc(self, desc):
+        self.ui.plainTextEditExampleDesc.setPlainText(desc)
+
+    def getExampleResponse(self):
+        return self.ui.plainTextEditExampleResponse.toPlainText()
+    
+    def setExampleResonse(self, response):
+        self.ui.plainTextEditExampleResponse.setPlainText(response)
+
     def clear(self):
         # clear lineEdit and plainTextEdit
         self.ui.lineEditExample.clear()
         self.ui.plainTextEdit.clear()
+        self.ui.plainTextEditExampleDesc.clear()

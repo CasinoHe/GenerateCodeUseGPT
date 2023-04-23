@@ -218,7 +218,9 @@ class GenerateCodeDialog(QDialog):
         for example_tab in self.example_tabs:
             single_exmaple_info = {
                 "file": example_tab.getExampleFile(),
-                "content": example_tab.getExampleContent()
+                "content": example_tab.getExampleContent(),
+                "desc": example_tab.getExampleDesc(),
+                "response": example_tab.getExampleResponse()
             }
             example_info.append(single_exmaple_info)
     
@@ -228,6 +230,7 @@ class GenerateCodeDialog(QDialog):
         prompt_file = self.ui.lineEditPrompt.text()
         prompt_info["file"] = prompt_file
         prompt_info["content"] = prompt
+        prompt_info["system"] = self.ui.lineEditSystem.text()
 
     def _packGenerateInfo(self, generate_info):
         # get model
@@ -270,6 +273,8 @@ class GenerateCodeDialog(QDialog):
                 self.clickAddExampleTab()
             self.example_tabs[index].setExampleFile(exmaple_info[index]["file"])
             self.example_tabs[index].setExampleContent(exmaple_info[index]["content"])
+            self.example_tabs[index].setExampleDesc(exmaple_info[index]["desc"])
+            self.example_tabs[index].setExampleResponse(exmaple_info[index]["response"])
         # second, remove extra example tab
         for index in range(len(exmaple_info), len(self.example_tabs)):
             self.clickDeleteExampleTab()
@@ -278,6 +283,7 @@ class GenerateCodeDialog(QDialog):
         # load prompt info from a json file
         self.ui.lineEditPrompt.setText(prompt_info["file"])
         self.ui.plainTextEditPrompt.setPlainText(prompt_info["content"])
+        self.ui.lineEditSystem.setText(prompt_info["system"])
 
     def _unpackGenerateInfo(self, generate_info):
         # load generate info from a json file
@@ -307,10 +313,19 @@ class GenerateCodeDialog(QDialog):
         # get examples's content
         examples = []
         for example_tab in self.example_tabs:
-            examples.append(example_tab.getExampleContent())
+            # example element is a dict, with key "content" and "desc"
+            element = {
+                "content": example_tab.getExampleContent(),
+                "desc": example_tab.getExampleDesc(),
+                "response": example_tab.getExampleResponse(),
+            }
+            examples.append(element)
 
         # get prompt
         prompt = self.ui.plainTextEditPrompt.toPlainText()
+
+        # get system info
+        system_info = self.ui.lineEditSystem.text()
 
         # init generate result environment
         self.initGenerateResult()
@@ -318,7 +333,7 @@ class GenerateCodeDialog(QDialog):
         # we need a lambda function to call onGenerateResultAppend
         callback = lambda result: self.onGenerateResultAppend(result)
         # send request to llm interface
-        self.llm_interface.llm_request(model=model, temperature=temperature, examples=examples, prompt=prompt, callback=callback)
+        self.llm_interface.llm_request(model=model, temperature=temperature, examples=examples, system_info=system_info, prompt=prompt, callback=callback)
 
     def onGenerateResult(self, result):
         # show result in plainTextEditResult

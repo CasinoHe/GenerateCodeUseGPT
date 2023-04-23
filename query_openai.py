@@ -85,6 +85,7 @@ class OpenAIUtil(object):
         # if some parameters are not set, we need to set them
         model = kwargs.get('model', 'gpt-3.5-turbo')
         temperature = kwargs.get('temperature', 0.0)
+        system = kwargs.get('system_info', '')
         prompt = kwargs.get('prompt', '')
         examples = kwargs.get('examples', [])
         callback = kwargs.get('callback', None)
@@ -92,17 +93,28 @@ class OpenAIUtil(object):
         if not prompt:
             return None
 
-        message = [
-            {'role': 'system', 'content': '''You are a professional programmer in our game develop team.'''},
-        ]
+        if system:
+            message = [
+                {'role': 'system', 'content': system},
+            ]
+        else:
+            message = [
+                {'role': 'system', 'content': '''You are a professional programmer in our game develop team.'''},
+            ]
 
         if examples:
-            message.append({'role': 'user', 'content': '''Here are some examples of our game code:'''})
+            # message.append({'role': 'user', 'content': '''Here are some examples of our game code:'''})
             index = 0
             for example in examples:
                 order = number_parser.parse_ordinal(str(index))
-                message.append({'role': 'user', 'content': '''This is {} example, please read it: '''.format(order) + example})
+                if example['desc']:
+                    message.append({'role': 'user', 'content': '''This is {} example, the description is: {}, the example is: {}'''.format(order, example['desc'], example["content"])}) 
+                else:
+                    message.append({'role': 'user', 'content': '''This is {} example, please read it: '''.format(order) + example["content"]})
                 index += 1
+
+                if example['response']:
+                    message.append({'role': 'assistant', 'content': example['response']})
             
         message.append({'role': 'user', 'content': prompt})
 
@@ -113,7 +125,12 @@ class OpenAIUtil(object):
                 model = model,
                 temperature = temperature,
                 stream = True,
-                messages = message
+                messages = message,
+                # top_p = 1,
+                # n = 1,
+                # max_tokens = 4096,
+                # presence_penalty = 0,
+                # frequency_penalty = 0,
             )
 
             for chunk in response:

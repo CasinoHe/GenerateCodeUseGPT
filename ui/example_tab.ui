@@ -25,6 +25,34 @@
         <item>
          <widget class="QPlainTextEdit" name="plainTextEdit"/>
         </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QGroupBox" name="groupBoxDesc">
+            <property name="title">
+             <string>Desc</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QPlainTextEdit" name="plainTextEditExampleDesc"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBoxResponse">
+            <property name="title">
+             <string>Response</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QPlainTextEdit" name="plainTextEditExampleResponse"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
       </widget>
      </item>
