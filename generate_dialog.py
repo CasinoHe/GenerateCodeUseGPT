@@ -12,6 +12,7 @@ from ui import generate_dialog_ui
 import threading
 import example_tab
 import json
+import copy
 
 class GenerateCodeDialog(QDialog):
     '''
@@ -31,7 +32,6 @@ class GenerateCodeDialog(QDialog):
         self.example_tabs = []
         self.llm_interface = llm_interface
         self.result_content = []
-        self.result_index = 0
         self.result_update_timer = QTimer(self)
         self.result_update_mutex = threading.Lock()
         self.result_completed = False
@@ -155,6 +155,9 @@ class GenerateCodeDialog(QDialog):
         # get model list from llm interface
         model_list = self.llm_interface.get_models_name()
 
+        # initialize the timer
+        self.timer = None
+
         # because we need to access web interface to get model list, so we need a asynchroneous function
         if not model_list:
             # if we cannot get model list, we use a timer to check the model list
@@ -167,7 +170,9 @@ class GenerateCodeDialog(QDialog):
         else:
             # enable the combobox
             self.ui.comboBoxModel.setEnabled(True)
-            self.timer.stop()
+            if self.timer:
+                # stop the timer
+                self.timer.stop()
 
         # add model list to combobox
         self.ui.comboBoxModel.addItems(model_list)
@@ -358,7 +363,7 @@ class GenerateCodeDialog(QDialog):
         self.ui.pushButtonCopyResult.setEnabled(True)
         self.result_update_timer.stop()
         self.result_update_timer.deleteLater()
-        self.result_index = 0
+        self.result_content = []
 
     def appendResult(self, result):
         # append result in plainTextEditResult without newline
@@ -372,7 +377,6 @@ class GenerateCodeDialog(QDialog):
         self.ui.plainTextEditResult.clear()
         self.ui.pushButtonCopyResult.setEnabled(False)
         self.result_content = []
-        self.result_index = 0
         self.result_completed = False
         self.result_update_mutex = threading.Lock()
         self.result_update_timer = QTimer(self)
@@ -380,12 +384,19 @@ class GenerateCodeDialog(QDialog):
         self.result_update_timer.start(100)
 
     def onUpdateResultTimeout(self):
-        # if result index is not equal to result content length, we append result
+        # if result content is not empty, output to result text edit
         self.result_update_mutex.acquire()
-        if self.result_index != len(self.result_content) - 1:
-            for i in range(self.result_index, len(self.result_content)):
-                self.appendResult(self.result_content[i])
-                self.result_index += 1
-        if self.result_completed:
-            self.onGenerateResultCompleted()
+        result_content = []
+        if self.result_content:
+            result_content = copy.deepcopy(self.result_content)
+            self.result_content = []
         self.result_update_mutex.release()
+
+        for content in result_content:
+            self.appendResult(content)
+        if self.result_completed:
+            self.result_update_mutex.acquire()
+            for content in self.result_content:
+                self.appendResult(content)
+            self.onGenerateResultCompleted()
+            self.result_update_mutex.release()

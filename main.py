@@ -9,7 +9,6 @@ from PyQt6.QtWidgets import QApplication
 
 import generate_dialog
 import query_openai
-import threading
 
 class LLMInterface(object):
     def __init__(self):

@@ -74,7 +74,7 @@ class ExampleTab(QWidget):
     def getExampleResponse(self):
         return self.ui.plainTextEditExampleResponse.toPlainText()
     
-    def setExampleResonse(self, response):
+    def setExampleResponse(self, response):
         self.ui.plainTextEditExampleResponse.setPlainText(response)
 
     def clear(self):
