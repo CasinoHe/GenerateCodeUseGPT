@@ -284,6 +284,10 @@ class GenerateCodeDialog(QDialog):
         for index in range(len(exmaple_info), len(self.example_tabs)):
             self.clickDeleteExampleTab()
 
+        if len(self.example_tabs) > 0:
+            # enable new example tab
+            self.ui.pushButtonNewExample.setEnabled(True)
+
     def _unpackPromptInfo(self, prompt_info):
         # load prompt info from a json file
         self.ui.lineEditPrompt.setText(prompt_info["file"])

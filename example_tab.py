@@ -61,6 +61,7 @@ class ExampleTab(QWidget):
 
     def setExampleFile(self, filepath):
         self.ui.lineEditExample.setText(filepath)
+        self.ui.pushButtonRefresh.setEnabled(True)
 
     def setExampleContent(self, content):
         self.ui.plainTextEdit.setPlainText(content)
