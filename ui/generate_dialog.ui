@@ -260,55 +260,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBoxEstimate">
-       <property name="title">
-        <string>Estimate</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_17">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_18">
-            <item>
-             <widget class="QLabel" name="labelEstimateToken">
-              <property name="text">
-               <string>Estimate token amount: </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditTokenAmount">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_20">
-            <item>
-             <widget class="QLabel" name="labelEstimateCost">
-              <property name="text">
-               <string>Estimate cost: </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditEstimateCost">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <widget class="QGroupBox" name="groupBox_OutPut">
        <property name="title">
         <string>Result</string>
@@ -317,7 +268,52 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEditResult"/>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <widget class="QPlainTextEdit" name="plainTextEditResult"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <item>
+               <widget class="QLabel" name="labelUsedToken">
+                <property name="text">
+                 <string>Used token amount: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditTokenAmount">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="labelEstimateCost">
+                <property name="text">
+                 <string>Estimate cost: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditEstimateCost">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_13">
