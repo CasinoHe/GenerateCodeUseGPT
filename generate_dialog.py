@@ -321,14 +321,16 @@ class GenerateCodeDialog(QDialog):
 
         # get examples's content
         examples = []
-        for example_tab in self.example_tabs:
-            # example element is a dict, with key "content" and "desc"
-            element = {
-                "content": example_tab.getExampleContent(),
-                "desc": example_tab.getExampleDesc(),
-                "response": example_tab.getExampleResponse(),
-            }
-            examples.append(element)
+        # if there is only 1 example tab, and the content is empty, then we don't need to send request
+        if len(self.example_tabs) > 1 or self.example_tabs[0].getExampleContent():
+            for example_tab in self.example_tabs:
+                # example element is a dict, with key "content" and "desc"
+                element = {
+                    "content": example_tab.getExampleContent(),
+                    "desc": example_tab.getExampleDesc(),
+                    "response": example_tab.getExampleResponse(),
+                }
+                examples.append(element)
 
         # get prompt
         prompt = self.ui.plainTextEditPrompt.toPlainText()
