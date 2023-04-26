@@ -104,7 +104,7 @@ class OpenAIUtil(object):
 
         if examples:
             # message.append({'role': 'user', 'content': '''Here are some examples of our game code:'''})
-            index = 0
+            index = 1
             for example in examples:
                 order = number_parser.parse_ordinal(str(index))
                 if example['desc']:
@@ -134,6 +134,8 @@ class OpenAIUtil(object):
             )
 
             for chunk in response:
+                if 'usage' in chunk:
+                    print ('usage is :', chunk['usage'])
                 # if the response is completed, we need to notify the main thread
                 if chunk['choices'][0]['finish_reason'] in ['stop', 'max_tokens', 'timeout', 'length', 'api_call_error']: # type: ignore
                     print("response completed, the result is :{}".format(chunk['choices'][0]['finish_reason'])) # type: ignore
