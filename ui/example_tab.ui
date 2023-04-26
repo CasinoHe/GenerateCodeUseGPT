@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>915</width>
-    <height>300</height>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,18 +19,67 @@
      <item>
       <widget class="QGroupBox" name="groupBoxExample">
        <property name="title">
-        <string>Content</string>
+        <string>Example Content</string>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit"/>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QPlainTextEdit" name="plainTextEdit"/>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBoxTabOperation">
+            <property name="title">
+             <string>Example Content Operation</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <item>
+                  <widget class="QLabel" name="labelOPenExample">
+                   <property name="text">
+                    <string>File path : </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEditExample">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButtonOpenExample">
+                   <property name="text">
+                    <string>Open</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButtonRefresh">
+                   <property name="text">
+                    <string>Refresh</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QGroupBox" name="groupBoxDesc">
             <property name="title">
-             <string>Desc</string>
+             <string>Example Desc</string>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
@@ -42,7 +91,7 @@
           <item>
            <widget class="QGroupBox" name="groupBoxResponse">
             <property name="title">
-             <string>Response</string>
+             <string>Example Response</string>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
@@ -50,51 +99,6 @@
              </item>
             </layout>
            </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBoxTabOperation">
-       <property name="title">
-        <string>Operation</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QLabel" name="labelOPenExample">
-              <property name="text">
-               <string>File path : </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditExample">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonOpenExample">
-              <property name="text">
-               <string>Open</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonRefresh">
-              <property name="text">
-               <string>Refresh</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
          </layout>
         </item>

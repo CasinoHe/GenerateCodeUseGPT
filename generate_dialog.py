@@ -11,6 +11,7 @@ from PyQt6 import uic
 from ui import generate_dialog_ui
 import threading
 import example_tab
+import prompt_tab
 import json
 import copy
 
@@ -30,6 +31,7 @@ class GenerateCodeDialog(QDialog):
         self.ui.setupUi(self)
 
         self.example_tabs = []
+        self.prompt_tabs = []
         self.llm_interface = llm_interface
         self.result_content = []
         self.result_update_timer = QTimer(self)
@@ -66,6 +68,11 @@ class GenerateCodeDialog(QDialog):
 
         # disable new example button first, because there is no file selected
         self.ui.pushButtonNewExample.setEnabled(False)
+
+        # get the height of tab widget, if height is less than 300, set it to 350
+        tab_widget_height = self.ui.tabWidgetExamples.height()
+        if tab_widget_height < 350:
+            self.ui.tabWidgetExamples.setFixedHeight(350)
 
     def clickClearExampleTab(self):
         # get active tab index
@@ -105,16 +112,29 @@ class GenerateCodeDialog(QDialog):
         self.ui.pushButtonNewExample.setEnabled(True)
 
     def initPromptGroup(self):
-        # disable the file line edit first
-        self.ui.lineEditPrompt.setEnabled(False)
+        # delete default tab, there is two default tabs
+        self.ui.tabWidgetPrompt.removeTab(1)
+        self.ui.tabWidgetPrompt.removeTab(0)
 
-        # disable refresh button first, because there is no file selected
-        self.ui.pushButtonRefreshPrompt.setEnabled(False)
+        # create new tab
+        self.prompt_tabs.append(prompt_tab.PromptTab(self))
+        self.ui.tabWidgetPrompt.addTab(self.prompt_tabs[0], "Prompt {}".format(len(self.prompt_tabs)))
 
-        # connect signals and slots
-        self.ui.pushButtonOpenPromptFile.clicked.connect(self.clickOpenPromptFile)
-        self.ui.pushButtonRefreshPrompt.clicked.connect(self.clickRefreshPrompt)
-        self.ui.pushButtonClearPrompt.clicked.connect(self.clickClearPrompt)
+        # check the height of group box, if height is less than 350, set it to 350
+        group_box_height = self.ui.groupBoxPrompt.height()
+        if group_box_height < 400:
+            self.ui.groupBoxPrompt.setFixedHeight(400)
+
+        # # disable the file line edit first
+        # self.ui.lineEditPrompt.setEnabled(False)
+
+        # # disable refresh button first, because there is no file selected
+        # self.ui.pushButtonRefreshPrompt.setEnabled(False)
+
+        # # connect signals and slots
+        # self.ui.pushButtonOpenPromptFile.clicked.connect(self.clickOpenPromptFile)
+        # self.ui.pushButtonRefreshPrompt.clicked.connect(self.clickRefreshPrompt)
+        # self.ui.pushButtonClearPrompt.clicked.connect(self.clickClearPrompt)
 
     def clickOpenPromptFile(self):
         # use QFileDialog to select a prompt file
