@@ -489,5 +489,6 @@ class GenerateCodeDialog(QDialog):
         # new prompt and set current index
         self.clickAddPromptTab()
         # set focus to previous prompt content
+        self.ui.tabWidgetPrompt.setCurrentIndex(self.ui.tabWidgetPrompt.count() - 2)
         prompt_tab = self.prompt_tabs[-2]
         prompt_tab.setFocusResponseContent()
