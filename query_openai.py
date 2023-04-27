@@ -85,13 +85,23 @@ class OpenAIUtil(object):
         # if some parameters are not set, we need to set them
         model = kwargs.get('model', 'gpt-3.5-turbo')
         temperature = kwargs.get('temperature', 0.0)
-        system = kwargs.get('system_info', '')
-        prompt = kwargs.get('prompt', '')
+        prompts = kwargs.get('prompts', '')
         examples = kwargs.get('examples', [])
         callback = kwargs.get('callback', None)
 
-        if not prompt:
+        if not prompts:
+            if callback:
+                callback("No prompts, Generate exit.")
+                callback("")
             return None
+
+        # the system information in the last prompt is the system information send to openai
+        system = ""
+        # reverse iterate the prompts, we need to get the system information
+        for prompt in reversed(prompts):
+            system = prompt['system'] # type: ignore
+            if system:
+                break
 
         if system:
             message = [
@@ -103,7 +113,6 @@ class OpenAIUtil(object):
             ]
 
         if examples:
-            # message.append({'role': 'user', 'content': '''Here are some examples of our game code:'''})
             index = 1
             for example in examples:
                 order = number_parser.parse_ordinal(str(index))
@@ -116,7 +125,11 @@ class OpenAIUtil(object):
                 if example['response']:
                     message.append({'role': 'assistant', 'content': example['response']})
             
-        message.append({'role': 'user', 'content': prompt})
+        for prompt in prompts:
+            if not prompt['content']: # type: ignore
+                continue
+            message.append({'role': 'user', 'content': prompt['content']}) # type: ignore
+            message.append({'rold': 'assistant', 'content': prompt['response']}) # type: ignore
 
         # use the stream to get the response
         # we cannot occupy the main thread for a long time, otherwise the gui or other logic which requires the main thread will be blocked
@@ -135,7 +148,7 @@ class OpenAIUtil(object):
 
             for chunk in response:
                 if 'usage' in chunk:
-                    print ('usage is :', chunk['usage'])
+                    print ('usage is :', chunk['usage']) # type: ignore
                 # if the response is completed, we need to notify the main thread
                 if chunk['choices'][0]['finish_reason'] in ['stop', 'max_tokens', 'timeout', 'length', 'api_call_error']: # type: ignore
                     print("response completed, the result is :{}".format(chunk['choices'][0]['finish_reason'])) # type: ignore

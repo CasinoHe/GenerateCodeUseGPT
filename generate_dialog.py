@@ -122,39 +122,47 @@ class GenerateCodeDialog(QDialog):
 
         # check the height of group box, if height is less than 350, set it to 350
         group_box_height = self.ui.groupBoxPrompt.height()
-        if group_box_height < 400:
-            self.ui.groupBoxPrompt.setFixedHeight(400)
+        if group_box_height < 350:
+            self.ui.groupBoxPrompt.setFixedHeight(350)
 
-        # # disable the file line edit first
-        # self.ui.lineEditPrompt.setEnabled(False)
+        # connect signals and slots
+        self.ui.pushButtonNewPrompt.clicked.connect(self.clickAddPromptTab)
+        # connect delete button
+        self.ui.pushButtonDeletePrompt.clicked.connect(self.clickDeletePromptTab)
+        # connect clear prompt button
+        self.ui.pushButtonClearPrompt.clicked.connect(self.clickClearPromptTab)
 
-        # # disable refresh button first, because there is no file selected
-        # self.ui.pushButtonRefreshPrompt.setEnabled(False)
+    def clickAddPromptTab(self):
+        # if the prompt content in the last tab is empty, do not add new tab
+        if self.prompt_tabs[-1].isEmpty():
+            QMessageBox.warning(self, "Warning", "Please input the prompt content first")
+            return
+        self.prompt_tabs.append(prompt_tab.PromptTab(self))
+        self.ui.tabWidgetPrompt.addTab(self.prompt_tabs[-1], "Prompt {}".format(len(self.prompt_tabs)))
+        # change tab to the new tab
+        self.ui.tabWidgetPrompt.setCurrentIndex(len(self.prompt_tabs) - 1)
 
-        # # connect signals and slots
-        # self.ui.pushButtonOpenPromptFile.clicked.connect(self.clickOpenPromptFile)
-        # self.ui.pushButtonRefreshPrompt.clicked.connect(self.clickRefreshPrompt)
-        # self.ui.pushButtonClearPrompt.clicked.connect(self.clickClearPrompt)
+    def clickDeletePromptTab(self):
+        # if there is only one tab, send a warning message to user and return
+        if len(self.prompt_tabs) <= 1:
+            QMessageBox.warning(self, "Warning", "There is only one prompt tab, can't delete it")
+            return
+        # get active tab index
+        tab_index = self.ui.tabWidgetPrompt.currentIndex()
+        self.ui.tabWidgetPrompt.removeTab(tab_index)
+        self.prompt_tabs.pop(tab_index)
+        # update tab index
+        for i in range(len(self.prompt_tabs)):
+            self.ui.tabWidgetPrompt.setTabText(i, "Prompt {}".format(i + 1))
 
-    def clickOpenPromptFile(self):
-        # use QFileDialog to select a prompt file
-        prompt_file, _ = QFileDialog.getOpenFileName(self, "Open Prompt File", "", "Text Files (*.txt)")
-        if prompt_file:
-            self.ui.lineEditPrompt.setText(prompt_file)
-            # enable refresh button
-            self.ui.pushButtonRefreshPrompt.setEnabled(True)
-
-            # read file content and show it in PlainTextEdit
-            with open(prompt_file, "r", encoding='utf-8') as f:
-                self.ui.plainTextEditPrompt.setPlainText(f.read())
-
-    def clickRefreshPrompt(self):
-        # read file content and show it in PlainTextEdit
-        with open(self.ui.lineEditPrompt.text(), "r", encoding='utf-8') as f:
-            self.ui.plainTextEditPrompt.setPlainText(f.read())
-
-    def clickClearPrompt(self):
-        self.ui.plainTextEditPrompt.clear()
+    def clickClearPromptTab(self):
+        # get active tab index
+        tab_index = self.ui.tabWidgetPrompt.currentIndex()
+        # if tab_index is 0, or there is other tab exist, do not clear
+        if tab_index != 0 or len(self.prompt_tabs) > 1:
+            QMessageBox.warning(self, "Warning", "Please delete the tab first")
+            return
+        self.prompt_tabs[tab_index].clear()
 
     def initGenerateCodeGroup(self):
         # connect signals and slots
@@ -165,6 +173,8 @@ class GenerateCodeDialog(QDialog):
         self.ui.pushButtonLoadQueryInfo.clicked.connect(self.clickLoadInfo)
         # connect copy result button
         self.ui.pushButtonCopyResult.clicked.connect(self.clickCopyResult)
+        # connect send result to propt response edit button
+        self.ui.pushButtonSendPrompt.clicked.connect(self.clickSendPrompt)
 
         # we cannot modify the result, so we disable the result plain text edit
         self.ui.plainTextEditResult.setReadOnly(True)
@@ -220,7 +230,7 @@ class GenerateCodeDialog(QDialog):
         # build example info
         example_info = []
         self._packExampleInfo(example_info)
-        prompt_info = {}
+        prompt_info = []
         self._packPromptInfo(prompt_info)
         generate_info = {}
         self._packGenerateInfo(generate_info)
@@ -250,12 +260,19 @@ class GenerateCodeDialog(QDialog):
             example_info.append(single_exmaple_info)
     
     def _packPromptInfo(self, prompt_info):
-        # get prompt
-        prompt = self.ui.plainTextEditPrompt.toPlainText()
-        prompt_file = self.ui.lineEditPrompt.text()
-        prompt_info["file"] = prompt_file
-        prompt_info["content"] = prompt
-        prompt_info["system"] = self.ui.lineEditSystem.text()
+        # get all prompts
+        for prompt_tab in self.prompt_tabs:
+            single_prompt_info = {
+                "file": prompt_tab.getPromptFile(),
+                "content": prompt_tab.getPromptContent(),
+                "system": prompt_tab.getPromptSystem(),
+                "response": prompt_tab.getPromptResponse()
+            }
+
+            if not single_prompt_info['content'] and not single_prompt_info['response'] and not single_prompt_info['system']:
+                continue
+
+            prompt_info.append(single_prompt_info)
 
     def _packGenerateInfo(self, generate_info):
         # get model
@@ -309,10 +326,36 @@ class GenerateCodeDialog(QDialog):
             self.ui.pushButtonNewExample.setEnabled(True)
 
     def _unpackPromptInfo(self, prompt_info):
-        # load prompt info from a json file
-        self.ui.lineEditPrompt.setText(prompt_info["file"])
-        self.ui.plainTextEditPrompt.setPlainText(prompt_info["content"])
-        self.ui.lineEditSystem.setText(prompt_info["system"])
+        # load prompt info from a json file, there maybe an old style prompt info
+        # old style is only a dict, new style is a list of dict
+        if isinstance(prompt_info, dict):
+            # old style, there is only one prompt
+            # delete the extra prompt tab
+            for index in range(1, len(self.prompt_tabs)):
+                self.clickDeletePromptTab()
+            # clear the first prompt tab
+            # set the active tab to the first tab
+            self.ui.tabWidgetPrompt.setCurrentIndex(0)
+            self.clickClearPromptTab()
+
+            prompt_tab = self.prompt_tabs[0]
+            prompt_tab.setPromptFile(prompt_info["file"])
+            prompt_tab.setPromptContent(prompt_info["content"])
+            prompt_tab.setPromptSystem(prompt_info["system"])
+        else:
+            # new style
+            # first, set prompt tab data
+            for index in range(len(prompt_info)):
+                if index >= len(self.prompt_tabs):
+                    self.clickAddPromptTab()
+                self.prompt_tabs[index].setPromptFile(prompt_info[index]["file"])
+                self.prompt_tabs[index].setPromptContent(prompt_info[index]["content"])
+                self.prompt_tabs[index].setPromptSystem(prompt_info[index]["system"])
+                self.prompt_tabs[index].setPromptResponse(prompt_info[index]["response"])
+
+            # second, remove extra prompt tab
+            for index in range(len(prompt_info), len(self.prompt_tabs)):
+                self.clickDeletePromptTab()
 
     def _unpackGenerateInfo(self, generate_info):
         # load generate info from a json file
@@ -353,10 +396,15 @@ class GenerateCodeDialog(QDialog):
                 examples.append(element)
 
         # get prompt
-        prompt = self.ui.plainTextEditPrompt.toPlainText()
-
-        # get system info
-        system_info = self.ui.lineEditSystem.text()
+        prompts = []
+        for prompt_tab in self.prompt_tabs:
+            # prompt element is a dict, with key "content" and "system"
+            element = {
+                "content": prompt_tab.getPromptContent(),
+                "system": prompt_tab.getPromptSystem(),
+                "response": prompt_tab.getPromptResponse(),
+            }
+            prompts.append(element)
 
         # init generate result environment
         self.initGenerateResult()
@@ -364,7 +412,7 @@ class GenerateCodeDialog(QDialog):
         # we need a lambda function to call onGenerateResultAppend
         callback = lambda result: self.onGenerateResultAppend(result)
         # send request to llm interface
-        self.llm_interface.llm_request(model=model, temperature=temperature, examples=examples, system_info=system_info, prompt=prompt, callback=callback)
+        self.llm_interface.llm_request(model=model, temperature=temperature, examples=examples, prompts=prompts, callback=callback)
 
     def onGenerateResult(self, result):
         # show result in plainTextEditResult
@@ -426,3 +474,20 @@ class GenerateCodeDialog(QDialog):
                 self.appendResult(content)
             self.onGenerateResultCompleted()
             self.result_update_mutex.release()
+
+    def clickSendPrompt(self):
+        # send the result context to prompt response edit
+        # find the last prompt tab
+        prompt_tab = self.prompt_tabs[-1]
+        # if the prompt content in last prompt tab is empty, then we don't need to send request
+        if prompt_tab.isPromptEmpty():
+            QMessageBox.warning(self, "Warning", "Prompt content is empty!")
+            return
+        prompt_tab.setPromptResponse(self.ui.plainTextEditResult.toPlainText())
+        # clear the result context
+        self.ui.plainTextEditResult.clear()
+        # new prompt and set current index
+        self.clickAddPromptTab()
+        # set focus to previous prompt content
+        prompt_tab = self.prompt_tabs[-2]
+        prompt_tab.setFocusResponseContent()
