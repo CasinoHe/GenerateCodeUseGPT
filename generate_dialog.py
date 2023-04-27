@@ -483,6 +483,10 @@ class GenerateCodeDialog(QDialog):
         if prompt_tab.isPromptEmpty():
             QMessageBox.warning(self, "Warning", "Prompt content is empty!")
             return
+        # if the result content is empty, then we don't need to send request
+        if self.ui.plainTextEditResult.toPlainText() == "":
+            QMessageBox.warning(self, "Warning", "Result content is empty!")
+            return
         prompt_tab.setPromptResponse(self.ui.plainTextEditResult.toPlainText())
         # clear the result context
         self.ui.plainTextEditResult.clear()
