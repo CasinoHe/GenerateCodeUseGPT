@@ -129,7 +129,8 @@ class OpenAIUtil(object):
             if not prompt['content']: # type: ignore
                 continue
             message.append({'role': 'user', 'content': prompt['content']}) # type: ignore
-            message.append({'role': 'assistant', 'content': prompt['response']}) # type: ignore
+            if prompt['response']: # type: ignore
+                message.append({'role': 'assistant', 'content': prompt['response']}) # type: ignore
 
         # use the stream to get the response
         # we cannot occupy the main thread for a long time, otherwise the gui or other logic which requires the main thread will be blocked
