@@ -406,6 +406,16 @@ class GenerateCodeDialog(QDialog):
             }
             prompts.append(element)
 
+        estimate_token, prompt_cost, complete_cost = self.llm_interface.get_estimate_cost(model=model, examples=examples, prompts=prompts)
+        # use confirm message box to confirm the cost
+        confirm_message = "This request will cost {} tokens, prompt cost is ${}, estimate of complete cost base on the token amount of prompt is ${}, continue?".format(estimate_token, prompt_cost, complete_cost)
+        reply = QMessageBox.question(self, "Confirm", confirm_message, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.No:
+            return
+
+        self.ui.lineEditEstimateCost.setText("$" + str(prompt_cost + complete_cost))
+        self.ui.lineEditTokenAmount.setText(str(estimate_token))
+
         # init generate result environment
         self.initGenerateResult()
 

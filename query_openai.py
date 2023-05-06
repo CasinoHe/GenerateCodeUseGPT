@@ -95,42 +95,7 @@ class OpenAIUtil(object):
                 callback("")
             return None
 
-        # the system information in the last prompt is the system information send to openai
-        system = ""
-        # reverse iterate the prompts, we need to get the system information
-        for prompt in reversed(prompts):
-            system = prompt['system'] # type: ignore
-            if system:
-                break
-
-        if system:
-            message = [
-                {'role': 'system', 'content': system},
-            ]
-        else:
-            message = [
-                {'role': 'system', 'content': '''You are a professional programmer in our game develop team.'''},
-            ]
-
-        if examples:
-            index = 1
-            for example in examples:
-                order = number_parser.parse_ordinal(str(index))
-                if example['desc']:
-                    message.append({'role': 'user', 'content': '''This is {} example, the description is: {}, the example is: {}'''.format(order, example['desc'], example["content"])}) 
-                else:
-                    message.append({'role': 'user', 'content': '''This is {} example, please read it: '''.format(order) + example["content"]})
-                index += 1
-
-                if example['response']:
-                    message.append({'role': 'assistant', 'content': example['response']})
-            
-        for prompt in prompts:
-            if not prompt['content']: # type: ignore
-                continue
-            message.append({'role': 'user', 'content': prompt['content']}) # type: ignore
-            if prompt['response']: # type: ignore
-                message.append({'role': 'assistant', 'content': prompt['response']}) # type: ignore
+        messages = self._build_message(prompts, examples)
 
         # use the stream to get the response
         # we cannot occupy the main thread for a long time, otherwise the gui or other logic which requires the main thread will be blocked
@@ -168,7 +133,7 @@ class OpenAIUtil(object):
                     print(chunk_message)
 
         # start a thread to get the response
-        t = threading.Thread(target=get_response, args=(self, model, temperature, message, callback))
+        t = threading.Thread(target=get_response, args=(self, model, temperature, messages, callback))
         t.start()
         self.thread_pool.append(t)
 
@@ -177,3 +142,104 @@ class OpenAIUtil(object):
         for t in self.thread_pool:
             t.join()
         self.thread_pool = []
+
+    def _build_message(self, prompts, examples):
+        # the system information in the last prompt is the system information send to openai
+        system = ""
+        # reverse iterate the prompts, we need to get the system information
+        for prompt in reversed(prompts):
+            system = prompt['system'] # type: ignore
+            if system:
+                break
+
+        if not system:
+            system = '''You are a professional programmer in our game develop team.'''
+        messages = [
+            {'role': 'system', 'content': system},
+        ]
+
+        if examples:
+            index = 1
+            for example in examples:
+                order = number_parser.parse_ordinal(str(index))
+                if example['desc']:
+                    messages.append({'role': 'user', 'content': '''This is {} example, the description is: {}, the example is: {}'''.format(order, example['desc'], example["content"])}) 
+                else:
+                    messages.append({'role': 'user', 'content': '''This is {} example, please read it: '''.format(order) + example["content"]})
+                index += 1
+
+                if example['response']:
+                    messages.append({'role': 'assistant', 'content': example['response']})
+            
+        for prompt in prompts:
+            if not prompt['content']: # type: ignore
+                continue
+            messages.append({'role': 'user', 'content': prompt['content']}) # type: ignore
+            if prompt['response']: # type: ignore
+                messages.append({'role': 'assistant', 'content': prompt['response']}) # type: ignore
+        return messages
+
+    def get_estimate_cost(self, **kwargs):
+        model = kwargs.get('model', 'gpt-3.5-turbo')
+        prompts = kwargs.get('prompts', '')
+        examples = kwargs.get('examples', [])
+
+        messages = self._build_message(prompts, examples)
+        estimate_token = self.count_token(messages, model)
+
+        price_dict = {
+            'gpt-3.5-turbo': [0.002, 0.002],
+            'text-davinci-003': [0.002, 0.002],
+            'text-davinci-002': [0.002, 0.002],
+            'code-davinci-002': [0.002, 0.002],
+            'gpt-4': [0.03, 0.06],
+            'gpt-4-0314': [0.03, 0.06], 
+            'gpt-4-32k': [0.06, 0.12],
+            'gpt-4-32k-0314': [0.06, 0.12],
+        }
+
+        prompt_cost = 0
+        complete_cost = 0
+
+        if model not in price_dict:
+            prompt_cost = 0.002
+            complete_cost = 0.002
+        else:
+            prompt_cost = price_dict[model][0]
+            complete_cost = price_dict[model][1]
+
+        return estimate_token, estimate_token * prompt_cost / 1000, estimate_token * complete_cost / 1000
+
+    def count_token(self, messages, model) -> int:
+        import tiktoken
+        """Returns the number of tokens used by a list of messages."""
+        try:
+            encoding = tiktoken.encoding_for_model(model)
+        except KeyError:
+            print("Warning: model not found. Using cl100k_base encoding.")
+            encoding = tiktoken.get_encoding("cl100k_base")
+
+        if model == "gpt-3.5-turbo":
+            # print("Warning: gpt-3.5-turbo may change over time. Returning num tokens assuming gpt-3.5-turbo-0301.")
+            return self.count_token(messages, model="gpt-3.5-turbo-0301")
+        elif model == "gpt-4":
+            # print("Warning: gpt-4 may change over time. Returning num tokens assuming gpt-4-0314.")
+            return self.count_token(messages, model="gpt-4-0314")
+        elif model == "gpt-3.5-turbo-0301":
+            tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
+            tokens_per_name = -1  # if there's a name, the role is omitted
+        elif model == "gpt-4-0314":
+            tokens_per_message = 3
+            tokens_per_name = 1
+        else:
+            raise NotImplementedError(f"""count_token() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.""")
+
+        num_tokens = 0
+        for message in messages:
+            num_tokens += tokens_per_message
+            for key, value in message.items():
+                num_tokens += len(encoding.encode(value))
+                if key == "name":
+                    num_tokens += tokens_per_name
+        num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
+        return num_tokens

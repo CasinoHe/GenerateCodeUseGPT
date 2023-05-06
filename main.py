@@ -20,6 +20,9 @@ class LLMInterface(object):
     def llm_request(self, **kwargs):
         return self.model_interface.llm_request(**kwargs)
 
+    def get_estimate_cost(self, **kwargs):
+        return self.model_interface.get_estimate_cost(**kwargs)
+
 if __name__ == "__main__":
     # prepare llm interface
     # we need another thread to run the interface, so we can use the GUI
