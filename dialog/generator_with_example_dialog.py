@@ -7,24 +7,25 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox, QFileDialog, QApplication
 from PyQt6.QtCore import QTimer 
 from PyQt6 import QtGui
-from PyQt6 import uic
 from ui import generate_dialog_ui
 import threading
-import example_tab
-import prompt_tab
+from dialog import example_tab
+from dialog import prompt_tab
 import json
 import copy
 
-class GenerateCodeDialog(QDialog):
+class GeneratorWithExampleDialog(QDialog):
     '''
-    GenerateCodeDialog is a dialog that provice convinient way to generate code
+    GeneratorWithExampleDialog is a dialog that provice convinient way to generate code
     the dialog is divided into 3 parts:
         1. select example file
         2. select prompt file
         3. select models, and set parameters, generate code
     '''
-    def __init__(self, llm_interface, parent=None):
-        super(GenerateCodeDialog, self).__init__(parent)
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.system = parent.system
 
         # load ui file
         self.ui = generate_dialog_ui.Ui_Dialog()
@@ -32,7 +33,6 @@ class GenerateCodeDialog(QDialog):
 
         self.example_tabs = []
         self.prompt_tabs = []
-        self.llm_interface = llm_interface
         self.result_content = []
         self.result_update_timer = QTimer(self)
         self.result_update_mutex = threading.Lock()
@@ -175,6 +175,8 @@ class GenerateCodeDialog(QDialog):
         self.ui.pushButtonCopyResult.clicked.connect(self.clickCopyResult)
         # connect send result to propt response edit button
         self.ui.pushButtonSendPrompt.clicked.connect(self.clickSendPrompt)
+        # connect supply name combo box change
+        self.ui.comboBoxSupplyName.currentIndexChanged.connect(self.changeSupplyName)
 
         # we cannot modify the result, so we disable the result plain text edit
         self.ui.plainTextEditResult.setReadOnly(True)
@@ -183,13 +185,13 @@ class GenerateCodeDialog(QDialog):
 
     def initModelComboBox(self):
         # get model list from llm interface
-        model_list = self.llm_interface.get_models_name()
+        model_dict = self.system.get_all_models()
 
-        # initialize the timer
+        # # initialize the timer
         self.timer = None
 
-        # because we need to access web interface to get model list, so we need a asynchroneous function
-        if not model_list:
+        # # because we need to access web interface to get model list, so we need a asynchroneous function
+        if not model_dict:
             # if we cannot get model list, we use a timer to check the model list
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.initModelComboBox)
@@ -204,6 +206,23 @@ class GenerateCodeDialog(QDialog):
                 # stop the timer
                 self.timer.stop()
 
+        # get model list
+        supplys = list(model_dict.keys())
+        supply = supplys[0]
+        model_list = model_dict[supply]
+
+        # add model list to combobox
+        self.ui.comboBoxModel.addItems(model_list)
+        self.ui.comboBoxSupplyName.addItems(supplys)
+
+    def changeSupplyName(self, index):
+        # get supply name
+        supply = self.ui.comboBoxSupplyName.currentText()
+        # get model list from llm interface
+        model_dict = self.system.get_all_models()
+        model_list = model_dict[supply]
+        # clear model combobox
+        self.ui.comboBoxModel.clear()
         # add model list to combobox
         self.ui.comboBoxModel.addItems(model_list)
 
@@ -406,7 +425,7 @@ class GenerateCodeDialog(QDialog):
             }
             prompts.append(element)
 
-        estimate_token, prompt_cost, complete_cost = self.llm_interface.get_estimate_cost(model=model, examples=examples, prompts=prompts)
+        estimate_token, prompt_cost, complete_cost = self.llm_interface.InterfaceGetEstimateCost(model=model, examples=examples, prompts=prompts)
         # use confirm message box to confirm the cost
         confirm_message = "This request will cost {} tokens, prompt cost is ${}, estimate of complete cost base on the token amount of prompt is ${}, continue?".format(estimate_token, prompt_cost, complete_cost)
         reply = QMessageBox.question(self, "Confirm", confirm_message, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)

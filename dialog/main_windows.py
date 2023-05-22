@@ -36,10 +36,20 @@ class ProductiveAIGCToolWindows(QMainWindow):
         '''
 
         # Settings menu
+        self.initGeneratorMenu()
+        self.initSettingsMenu()
+
+    def initSettingsMenu(self):
         new_menu = self.ui.menubar.addMenu("Settings")
         new_action = QAction("Open Setting", self)
         new_menu.addAction(new_action)
         new_action.triggered.connect(self.clickSettings)
+
+    def initGeneratorMenu(self):
+        new_menu = self.ui.menubar.addMenu("Generator")
+        new_action = QAction("Generator with Example", self)
+        new_menu.addAction(new_action)
+        new_action.triggered.connect(self.clickGeneratorWithExample)
 
     def clickSettings(self):
         '''
@@ -54,3 +64,14 @@ class ProductiveAIGCToolWindows(QMainWindow):
         if self.system.call_settings("InterfaceIsEmpty"):
             self.clickSettings()
             return False
+
+    def clickGeneratorWithExample(self):
+        '''
+        clickGeneratorWithExample will show a dialog to set the parameters of AIGC
+        '''
+        import dialog.generator_with_example_dialog
+
+        if self.setting_panel is None:
+            self.setting_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
+        self.setting_panel.show()
+        

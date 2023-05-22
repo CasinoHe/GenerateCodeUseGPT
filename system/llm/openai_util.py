@@ -2,35 +2,36 @@
 # purpose:
 #   a class to access openai's api
 
-import json
+from system.llm import llm_interface
 import openai
 import threading
 import number_parser
 
 
-class OpenAIUtil(object):
-    def __init__(self, conf_file):
-        self.conf_file = conf_file
-        self.open_ai_key = None
-        self.thread_pool = []
+class OpenAIUtil(llm_interface.LLMInterface):
+    def __init__(self, openai_key):
+        super().__init__()
+        self.open_ai_key = openai_key
 
+        self.thread_pool = []
         self.model_list = []
         self.model_name_list = []
         self.mutex = threading.Lock()
         self.model_init = False
 
-        self.get_open_ai_key()
+        self.update_openai_key()
         self._get_valid_models()
 
-    def get_open_ai_key(self):
-        if self.open_ai_key:
+    def update_openai_key(self):
+        if not self.open_ai_key:
             return
-
-        # get the openai key from a json config file, key is 'openai_api_key'
-        with open(self.conf_file, 'r') as f:
-            conf = json.load(f)
-            self.open_ai_key = conf['openai_api_key']
         openai.api_key = self.open_ai_key
+
+    def InterfaceIsValid(self):
+        return self.open_ai_key is not None
+
+    def InterfaceGetSupplyName(self):
+        return "OpenAI"
 
     def _get_valid_models(self):
         # if we have got the models, we don't need to get them again
@@ -60,7 +61,7 @@ class OpenAIUtil(object):
         t.start()
         self.thread_pool.append(t)
 
-    def get_models_name(self):
+    def InterfaceGetAllModelNames(self):
         # get the models name
         # if the model list is empty, we need to get the models first
         if not self.model_list:
@@ -80,7 +81,7 @@ class OpenAIUtil(object):
 
         self.model_init = False
 
-    def llm_request(self, **kwargs):
+    def InterfaceChatRequest(self, **kwargs):
         # there are many parameters in the request, we need to check them
         # if some parameters are not set, we need to set them
         model = kwargs.get('model', 'gpt-3.5-turbo')
@@ -179,7 +180,7 @@ class OpenAIUtil(object):
                 messages.append({'role': 'assistant', 'content': prompt['response']}) # type: ignore
         return messages
 
-    def get_estimate_cost(self, **kwargs):
+    def InterfaceGetEstimateCost(self, **kwargs):
         model = kwargs.get('model', 'gpt-3.5-turbo')
         prompts = kwargs.get('prompts', '')
         examples = kwargs.get('examples', [])

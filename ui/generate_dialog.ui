@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>916</width>
+    <width>1278</width>
     <height>888</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>896</width>
+        <width>1258</width>
         <height>868</height>
        </rect>
       </property>
@@ -296,6 +296,36 @@
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="QLabel" name="labelRealCost">
+                    <property name="text">
+                     <string>Real cost: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit"/>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_3">
+                    <property name="text">
+                     <string>Total cost: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEditTotalCost"/>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_2">
+                    <property name="text">
+                     <string>Historical cost: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEditHistoricalCost"/>
+                  </item>
                  </layout>
                 </item>
                </layout>
@@ -311,27 +341,45 @@
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_5">
                      <item>
-                      <widget class="QComboBox" name="comboBoxModel">
-                       <property name="toolTip">
-                        <string extracomment="Choose which model to use, for example, GPT-4"/>
-                       </property>
-                       <property name="toolTipDuration">
-                        <number>1</number>
-                       </property>
-                       <property name="whatsThis">
-                        <string extracomment="Choose which model to use, for example, GPT-4"/>
-                       </property>
-                      </widget>
+                      <layout class="QHBoxLayout" name="horizontalLayout_4">
+                       <item>
+                        <widget class="QComboBox" name="comboBoxSupplyName"/>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBoxModel">
+                         <property name="toolTip">
+                          <string extracomment="Choose which model to use, for example, GPT-4"/>
+                         </property>
+                         <property name="toolTipDuration">
+                          <number>1</number>
+                         </property>
+                         <property name="whatsThis">
+                          <string extracomment="Choose which model to use, for example, GPT-4"/>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
                      <item>
-                      <widget class="QDoubleSpinBox" name="doubleSpinBoxTemperature">
-                       <property name="maximum">
-                        <double>1.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.050000000000000</double>
-                       </property>
-                      </widget>
+                      <layout class="QHBoxLayout" name="horizontalLayout_5">
+                       <item>
+                        <widget class="QLabel" name="label">
+                         <property name="text">
+                          <string>Temperature: </string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QDoubleSpinBox" name="doubleSpinBoxTemperature">
+                         <property name="maximum">
+                          <double>1.000000000000000</double>
+                         </property>
+                         <property name="singleStep">
+                          <double>0.050000000000000</double>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
                      <item>
                       <widget class="QPushButton" name="pushButtonGenerateResult">
