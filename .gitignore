@@ -1,7 +1,9 @@
 __pycache__
 .vscode
 .vs
+*.code-workspace
 build
 
 # ignore conf.json because it contains sensitive information
-conf.json
+system/settings/config.json
+system/settings/conf.json
