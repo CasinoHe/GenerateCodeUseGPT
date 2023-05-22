@@ -21,6 +21,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
 
         self.initUI()
 
+        self.checkSettings()
+
     def initUI(self):
         self.initMenu()
 
@@ -47,3 +49,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
         if self.setting_panel is None:
             self.setting_panel = dialog.settings_tab.SettingsTab(self)
         self.setting_panel.show()
+
+    def checkSettings(self):
+        if self.system.call_settings("InterfaceIsEmpty"):
+            self.clickSettings()
+            return False

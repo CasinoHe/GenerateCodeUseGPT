@@ -1,3 +1,5 @@
-{
-	"openai_api_key": "YOUR OPENAI API KEY"
+{	
+	"openai_api_key": "YOUR OPENAI API KEY",
+	"google_palm_key": "YOUR GOOGLE makersuite API KEY",
+	"project_root_dir": "PROJECT ROOT DIR"
 }

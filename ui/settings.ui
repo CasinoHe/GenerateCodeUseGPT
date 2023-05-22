@@ -49,6 +49,13 @@
        <item>
         <widget class="QLineEdit" name="lineEditOpenAIKey"/>
        </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonApplyOpenAIKey">
+         <property name="text">
+          <string>Apply OpenAI api-key</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -56,12 +63,19 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>PaLM api-key: </string>
+          <string>Google PaLM api-key: </string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="lineEditGooglePalmKey"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonApplyGooglePalmKey">
+         <property name="text">
+          <string>Apply Google PaLM api-key</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

@@ -64,6 +64,21 @@ class Settings(object):
         with open(self.conf_file, 'w', encoding='utf-8') as f:
             json.dump(conf_json, f)
 
+    def is_empty(self):
+        if self.project_root_dir == "":
+            return True
+        if self.open_ai_key == "" and self.google_palm_key == "":
+            return True
+
+        return False
+
+    def InterfaceIsEmpty(self):
+        '''
+        Interface, called outside
+        check if the settings is empty
+        '''
+        return self.is_empty()
+
     def InterfaceSaveConf(self):
         '''
         Interface, called outside

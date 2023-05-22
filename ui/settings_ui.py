@@ -37,6 +37,9 @@ class Ui_Dialog(object):
         self.lineEditOpenAIKey = QtWidgets.QLineEdit(parent=Dialog)
         self.lineEditOpenAIKey.setObjectName("lineEditOpenAIKey")
         self.horizontalLayout_3.addWidget(self.lineEditOpenAIKey)
+        self.pushButtonApplyOpenAIKey = QtWidgets.QPushButton(parent=Dialog)
+        self.pushButtonApplyOpenAIKey.setObjectName("pushButtonApplyOpenAIKey")
+        self.horizontalLayout_3.addWidget(self.pushButtonApplyOpenAIKey)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -46,6 +49,9 @@ class Ui_Dialog(object):
         self.lineEditGooglePalmKey = QtWidgets.QLineEdit(parent=Dialog)
         self.lineEditGooglePalmKey.setObjectName("lineEditGooglePalmKey")
         self.horizontalLayout_4.addWidget(self.lineEditGooglePalmKey)
+        self.pushButtonApplyGooglePalmKey = QtWidgets.QPushButton(parent=Dialog)
+        self.pushButtonApplyGooglePalmKey.setObjectName("pushButtonApplyGooglePalmKey")
+        self.horizontalLayout_4.addWidget(self.pushButtonApplyGooglePalmKey)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
@@ -69,7 +75,9 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "Project Root Dir: "))
         self.pushButtonOpenFolder.setText(_translate("Dialog", "Open Folder..."))
         self.label_2.setText(_translate("Dialog", "OpenAI api-key:"))
-        self.label_3.setText(_translate("Dialog", "PaLM api-key: "))
+        self.pushButtonApplyOpenAIKey.setText(_translate("Dialog", "Apply OpenAI api-key"))
+        self.label_3.setText(_translate("Dialog", "Google PaLM api-key: "))
+        self.pushButtonApplyGooglePalmKey.setText(_translate("Dialog", "Apply Google PaLM api-key"))
 
 
 if __name__ == "__main__":
