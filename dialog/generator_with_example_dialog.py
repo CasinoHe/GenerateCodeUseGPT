@@ -220,7 +220,8 @@ class GeneratorWithExampleDialog(QDialog):
         model_list = model_dict[supply]
 
         # add model list to combobox
-        self.ui.comboBoxModel.addItems(model_list)
+        if model_list:
+            self.ui.comboBoxModel.addItems(model_list)
         self.ui.comboBoxSupplyName.addItems(supplys)
     
     def clickModelComboBox(self):
