@@ -83,10 +83,6 @@ class SettingsTab(QDialog):
             self.ui.lineEditRootDir.setText(folder_path)
 
     def accept(self) -> None:
-        if self.system.call_settings("InterfaceIsEmpty"):
-            QMessageBox.warning(self, "Warning", "Please set at least one api settings first")
-            return None
-
         if self.textChanged():
             # open a confirm dialog to confirm the settings
             reply = QMessageBox.question(self, "Confirm", "Are you sure to save the settings?",
@@ -94,7 +90,11 @@ class SettingsTab(QDialog):
             if reply == QMessageBox.StandardButton.Yes:
                 # save the settings
                 self.saveSettings()
-                return super().accept()
+                if self.system.call_settings("InterfaceIsEmpty"):
+                    QMessageBox.warning(self, "Warning", "Please set at least one api settings first")
+                    return None
+                else:
+                    return super().accept()
             else:
                 return None
         else:
