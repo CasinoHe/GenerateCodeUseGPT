@@ -7,7 +7,7 @@ from ui import prompt_tab_ui
 import json
 
 class PromptTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         super().__init__(parent)
 
         # init ui
@@ -15,6 +15,8 @@ class PromptTab(QWidget):
         self.ui.setupUi(self)
 
         self.initUI()
+
+        self.system = parent.system
 
     def initUI(self):
         # disable file lineEdit
@@ -25,38 +27,38 @@ class PromptTab(QWidget):
         self.ui.pushButtonPromptSave.clicked.connect(self.clickSavePrompt)
 
     def clickSavePrompt(self):
+        result_dir = self.system.call_settings("InterfaceGetResultJsonDir")
         # get prompt file path
-        prompt_file, _ = QFileDialog.getSaveFileName(self, "Save Prompt File", "", "JSON Files (*.json)")
+        prompt_file, _ = QFileDialog.getSaveFileName(self, "Save Prompt File", result_dir, "JSON Files (*.json)")
         if len(prompt_file) <= 0:
             # use QMessageBox to display a warning
             QMessageBox.warning(self, "Warning", "Please select a file first")
             return
 
         # get prompt content
-        prompt = {
-            "prompt": self.ui.plainTextEditPrompt.toPlainText(),
-            "system": self.ui.lineEditPromptSystem.text(),
-            "response": self.ui.plainTextEditResponse.toPlainText()
-        }
+        prompt = self.ui.plainTextEditPrompt.toPlainText()
+        context = self.ui.lineEditPromptSystem.text()
+        response = self.ui.plainTextEditResponse.toPlainText()
 
         # save prompt to file
-        with open(prompt_file, "w", encoding='utf-8') as f:
-            json.dump(prompt, f, ensure_ascii=False, indent=4)
+        result = self.system.call_database("InterfaceSavePrompt", prompt, context, response, prompt_file)
+        if result:
             QMessageBox.information(self, "Information", "Save prompt file successfully")
+        else:
+            QMessageBox.warning(self, "Warning", "Save prompt file failed")
 
     def clickOpenPromptFile(self):
+        result_dir = self.system.call_settings("InterfaceGetResultJsonDir")
         # use QFileDialog to select a prompt file
-        prompt_file, _ = QFileDialog.getOpenFileName(self, "Open Prompt File", "", "JSON Files (*.json)")
+        prompt_file, _ = QFileDialog.getOpenFileName(self, "Open Prompt File", result_dir, "JSON Files (*.json)")
         if prompt_file:
             self.ui.lineEditPromptFilePath.setText(prompt_file)
 
             # read file content and show it in PlainTextEdit
-            with open(prompt_file, "r", encoding='utf-8') as f:
-                # parse json file
-                prompt = json.load(f)
-                self.ui.plainTextEditPrompt.setPlainText(prompt["prompt"])
-                self.ui.lineEditPromptSystem.setText(prompt["system"])
-                self.ui.plainTextEditResponse.setPlainText(prompt["response"])
+            prompt, system, response = self.system.call_database("InterfaceLoadPrompt", prompt_file)
+            self.ui.plainTextEditPrompt.setPlainText(prompt)
+            self.ui.lineEditPromptSystem.setText(system)
+            self.ui.plainTextEditResponse.setPlainText(response)
 
     def clear(self):
         self.ui.lineEditPromptFilePath.clear()

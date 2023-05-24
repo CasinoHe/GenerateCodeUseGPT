@@ -9,9 +9,10 @@ class ExampleTab(QWidget):
     '''
     ExampleTab is a widget that provide convinient way to select example file
     '''
-    def __init__(self, callback, parent=None):
+    def __init__(self, callback, parent):
         super(ExampleTab, self).__init__(parent)
 
+        self.system = parent.system
         # init ui
         self.ui = example_tab_ui.Ui_TabWidget()
         self.ui.setupUi(self)
@@ -28,7 +29,8 @@ class ExampleTab(QWidget):
         self.ui.pushButtonRefresh.setEnabled(False)
         
     def clickOpenExampleFile(self):
-        filepath = QFileDialog.getOpenFileName(self, "Open Example File", "./", "Python Files (*.py);;All Files (*)")
+        project_dir = self.system.call_settings("InterfaceGetProjectRootDir")
+        filepath = QFileDialog.getOpenFileName(self, "Open Example File", project_dir, "Python Files (*.py);;All Files (*)")
         # if user select a file, then set the file path to lineEdit
         if len(filepath[0]) <= 0:
             return

@@ -2,6 +2,7 @@
 from system.settings import settings
 from system.llm import openai_util 
 from system.llm import googleai_util
+from system.prompt import database
 
 def call_system_decorator(system_name):
     """
@@ -62,6 +63,7 @@ class MainManager(object):
     def init_systems(self):
 
         self.settings = settings.Settings()
+        self.database = database.ResultDatabase()
         self.openai_util = openai_util.OpenAIUtil(self.settings.InterfaceGetOpenAIKey())
         self.googleai_util = googleai_util.GoogleAIUtil(self.settings.InterfaceGetGooglePalmKey())
 
@@ -88,6 +90,10 @@ class MainManager(object):
             return True
         else:
             return False
+
+    @call_system_decorator("database")
+    def call_database(self, *args, **kwargs):
+        return True
 
     def call_llm(self, *args, **kwargs):
         if 'supply' in kwargs and kwargs['supply'] is not None:

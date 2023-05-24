@@ -33,11 +33,13 @@ class ProductiveAIGCToolWindows(QMainWindow):
          2. Embeddings by AIGC
          3. Generate text module using AIGC
          4. Search text interface by AIGC
+         5. Review text interface by AIGC
         '''
 
         # Settings menu
-        self.initEmbeddingsMenu()
+        self.initReviewMenu()
         self.initGeneratorMenu()
+        self.initEmbeddingsMenu()
         self.initSettingsMenu()
 
     def initSettingsMenu(self):
@@ -47,8 +49,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
         new_action.triggered.connect(self.clickSettings)
 
     def initGeneratorMenu(self):
-        new_menu = self.ui.menubar.addMenu("Generator")
-        new_action = QAction("Generator with Example", self)
+        new_menu = self.ui.menubar.addMenu("Generate")
+        new_action = QAction("Generate with Example", self)
         new_menu.addAction(new_action)
         new_action.triggered.connect(self.clickGeneratorWithExample)
 
@@ -57,6 +59,15 @@ class ProductiveAIGCToolWindows(QMainWindow):
         new_action = QAction("Create Embeddings", self)
         new_menu.addAction(new_action)
         new_action.triggered.connect(self.clickEmbeddings)
+
+    def initReviewMenu(self):
+        new_menu = self.ui.menubar.addMenu("Review")
+        new_action = QAction("Code Review", self)
+        new_menu.addAction(new_action)
+        new_action.triggered.connect(self.clickReview)
+
+    def clickReview(self):
+        pass
 
     def clickSettings(self):
         '''

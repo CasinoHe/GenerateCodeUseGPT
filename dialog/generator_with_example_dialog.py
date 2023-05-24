@@ -244,9 +244,6 @@ class GeneratorWithExampleDialog(QDialog):
         if not save_file:
             return
 
-        # get parameters
-        save_info = {}
-
         # build example info
         example_info = []
         self._packExampleInfo(example_info)
@@ -254,19 +251,16 @@ class GeneratorWithExampleDialog(QDialog):
         self._packPromptInfo(prompt_info)
         generate_info = {}
         self._packGenerateInfo(generate_info)
-
-        save_info["examples"] = example_info
-        save_info["prompt"] = prompt_info
-        save_info["generate"] = generate_info
-
-        # if there is result, then save the result
         result = self.ui.plainTextEditResult.toPlainText()
-        if result: 
-            save_info["result"] = result
 
-        # save to file
-        with open(save_file, "w", encoding='utf-8') as f:
-            json.dump(save_info, f, indent=4)
+        # save file
+        save_result = self.system.call_database(
+            "InterfaceSaveResult", example_info, prompt_info, generate_info, result, save_file)
+
+        if save_result:
+            QMessageBox.information(self, "Save Query Info", "Save query info successfully!")
+        else:
+            QMessageBox.warning(self, "Save Query Info", "Save query info failed!")
 
     def _packExampleInfo(self, example_info):
         # get examples's content
@@ -299,6 +293,8 @@ class GeneratorWithExampleDialog(QDialog):
         model = self.ui.comboBoxModel.currentText()
         # get temperature
         temperature = self.ui.doubleSpinBoxTemperature.value()
+        supply = self.ui.comboBoxSupplyName.currentText()
+        generate_info["supply"] = supply
         generate_info["model"] = model
         generate_info["temperature"] = temperature
 
@@ -311,24 +307,22 @@ class GeneratorWithExampleDialog(QDialog):
             return
 
         # load json file
-        with open(load_file, "r", encoding='utf-8') as f:
-            load_info = json.load(f)
+        example_info, prompt_info, generate_info, result_info = self.system.call_database(
+            "InterfaceLoadResultFile", load_file)
+
+        if example_info is None:
+            QMessageBox.warning(self, "Load Query Info", "Load query info failed!")
+            return
 
         # set parameters
-        example_info = load_info["examples"]
         self._unpackExampleInfo(example_info)
-
-        prompt_info = load_info["prompt"]
         self._unpackPromptInfo(prompt_info)
-
-        generate_info = load_info["generate"]
         self._unpackGenerateInfo(generate_info)
-
-        result_info = load_info.get("result", None)
-        if result_info:
-            self._unpackResultInfo(result_info)
+        self._unpackResultInfo(result_info)
 
     def _unpackExampleInfo(self, exmaple_info):
+        if not exmaple_info:
+            return
         # load example info from a json file
         # first, set example tab data
         for index in range(len(exmaple_info)):
@@ -347,6 +341,8 @@ class GeneratorWithExampleDialog(QDialog):
             self.ui.pushButtonNewExample.setEnabled(True)
 
     def _unpackPromptInfo(self, prompt_info):
+        if not prompt_info:
+            return
         # load prompt info from a json file, there maybe an old style prompt info
         # old style is only a dict, new style is a list of dict
         if isinstance(prompt_info, dict):
@@ -379,7 +375,10 @@ class GeneratorWithExampleDialog(QDialog):
                 self.clickDeletePromptTab()
 
     def _unpackGenerateInfo(self, generate_info):
+        if not generate_info:
+            return
         # load generate info from a json file
+        supply = generate_info.get("supply", "OpenAI")
         model = generate_info["model"]
         temperature = generate_info["temperature"]
         self.ui.doubleSpinBoxTemperature.setValue(temperature)
@@ -392,7 +391,17 @@ class GeneratorWithExampleDialog(QDialog):
             # insert the model as the first item
             self.ui.comboBoxModel.insertItem(0, model)
 
+        # because there are already some supplies in combobox, so we need to find the supply index
+        supply_index = self.ui.comboBoxSupplyName.findText(supply)
+        if supply_index != -1:
+            self.ui.comboBoxSupplyName.setCurrentIndex(supply_index)
+        else:
+            # insert the supply as the first item
+            self.ui.comboBoxSupplyName.insertItem(0, supply)
+
     def _unpackResultInfo(self, result_info):
+        if not result_info:
+            return
         # load result info from a json file
         self.ui.plainTextEditResult.setPlainText(result_info)
 

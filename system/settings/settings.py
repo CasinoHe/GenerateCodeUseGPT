@@ -5,6 +5,16 @@ import json
 import os
 
 class Settings(object):
+    '''
+    Settings is a singleton class, it is used to load, parse and save setting file
+    '''
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
     def __init__(self):
         super().__init__()
 
