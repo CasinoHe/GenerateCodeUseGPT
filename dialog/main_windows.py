@@ -2,9 +2,11 @@
 # purpose: a windows that based on PySide6
 
 
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QFileSystemModel
 from PySide6.QtGui import QAction
+from PySide6.QtCore import QDir
 from ui import generate_windows_ui
+import os
 
 class ProductiveAIGCToolWindows(QMainWindow):
     '''
@@ -19,6 +21,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
         self.setting_panel = None
         self.gen_code_panel = None
         self.system = system_manager
+        self.result_path = ""
+        self.project_path = ""
 
         self.initUI()
 
@@ -26,6 +30,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
 
     def initUI(self):
         self.initMenu()
+        self.initResultDirectoryView()
+        self.initProjectRootDirectoryView()
 
     def initMenu(self):
         '''
@@ -78,6 +84,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
         if self.setting_panel is None:
             self.setting_panel = dialog.settings_tab.SettingsTab(self)
         self.setting_panel.show()
+        self.initProjectRootDirectoryView()
+        self.initResultDirectoryView()
 
     def checkSettings(self):
         if self.system.call_settings("InterfaceIsEmpty"):
@@ -106,3 +114,37 @@ class ProductiveAIGCToolWindows(QMainWindow):
         #     self.setting_panel = dialog.embedding_dialog.EmbeddingDialog(self)
         # self.setting_panel.show()
         pass
+
+    def initResultDirectoryView(self):
+        result_path = self.system.call_settings("InterfaceGetResultJsonDir")
+        if not result_path or os.path.exists(result_path) == False:
+            return
+
+        if self.result_path == result_path:
+            return
+        
+        self.result_path = result_path
+        tree_view = self.ui.treeViewResultDir
+        self.model = QFileSystemModel()
+        result_dir = QDir(result_path)
+        self.model.setRootPath(result_dir.absolutePath())
+        tree_view.setModel(self.model)
+        tree_view.setRootIndex(self.model.index(result_dir.absolutePath()))
+        tree_view.setColumnWidth(0, 200)
+
+    def initProjectRootDirectoryView(self):
+        project_path = self.system.call_settings("InterfaceGetProjectRootDir")
+        if not project_path or os.path.exists(project_path) == False:
+            return
+
+        if self.project_path == project_path:
+            return
+
+        self.project_path = project_path
+        tree_view = self.ui.treeViewProjectRootDir
+        self.model = QFileSystemModel()
+        project_dir = QDir(project_path)
+        self.model.setRootPath(project_dir.absolutePath())
+        tree_view.setModel(self.model)
+        tree_view.setRootIndex(self.model.index(project_dir.absolutePath()))
+        tree_view.setColumnWidth(0, 200)

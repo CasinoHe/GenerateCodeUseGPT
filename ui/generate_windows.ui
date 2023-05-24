@@ -26,7 +26,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QTreeView" name="treeView"/>
+            <widget class="QTreeView" name="treeViewProjectRootDir"/>
            </item>
           </layout>
          </widget>
@@ -38,7 +38,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QTreeView" name="treeView_2"/>
+            <widget class="QTreeView" name="treeViewResultDir"/>
            </item>
           </layout>
          </widget>

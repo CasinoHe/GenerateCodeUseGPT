@@ -37,10 +37,10 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayout_4 = QVBoxLayout(self.groupBox)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.treeView = QTreeView(self.groupBox)
-        self.treeView.setObjectName(u"treeView")
+        self.treeViewProjectRootDir = QTreeView(self.groupBox)
+        self.treeViewProjectRootDir.setObjectName(u"treeViewProjectRootDir")
 
-        self.verticalLayout_4.addWidget(self.treeView)
+        self.verticalLayout_4.addWidget(self.treeViewProjectRootDir)
 
 
         self.verticalLayout_3.addWidget(self.groupBox)
@@ -49,10 +49,10 @@ class Ui_MainWindow(object):
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.verticalLayout_5 = QVBoxLayout(self.groupBox_2)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.treeView_2 = QTreeView(self.groupBox_2)
-        self.treeView_2.setObjectName(u"treeView_2")
+        self.treeViewResultDir = QTreeView(self.groupBox_2)
+        self.treeViewResultDir.setObjectName(u"treeViewResultDir")
 
-        self.verticalLayout_5.addWidget(self.treeView_2)
+        self.verticalLayout_5.addWidget(self.treeViewResultDir)
 
 
         self.verticalLayout_3.addWidget(self.groupBox_2)
