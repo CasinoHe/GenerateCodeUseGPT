@@ -31,7 +31,7 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         palm.configure(api_key=self.palm_api_key)
 
     def InterfaceIsValid(self):
-        return self.palm_api_key is not None and self.model_list
+        return self.palm_api_key and self.model_list
     
     def InterfaceGetSupplyName(self):
         return "Google"

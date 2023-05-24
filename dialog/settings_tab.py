@@ -9,11 +9,11 @@ from PyQt6.QtGui import QDesktopServices
 import ui.settings_ui
 
 class SettingsTab(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         super().__init__(parent)
 
         # init system
-        self.system = parent.system.call_settings # type: ignore
+        self.system = parent.system
 
         # init ui
         self.ui = ui.settings_ui.Ui_Dialog()
@@ -28,10 +28,10 @@ class SettingsTab(QDialog):
         self.ui.pushButtonApplyGooglePalmKey.clicked.connect(self.clickApplyGooglePalmKey)
         self.ui.pushButtonOpenResultJsonDir.clicked.connect(self.clickOpenResultJsonDir)
 
-        openai_key = self.system("InterfaceGetOpenAIKey")
-        google_palm_key = self.system("InterfaceGetGooglePalmKey")
-        project_root_dir = self.system("InterfaceGetProjectRootDir")
-        result_json_dir = self.system("InterfaceGetResultJsonDir")
+        openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
+        google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
+        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
+        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
 
         self.ui.lineEditOpenAIKey.setText(openai_key)
         self.ui.lineEditGooglePalmKey.setText(google_palm_key)
@@ -39,10 +39,10 @@ class SettingsTab(QDialog):
         self.ui.lineEditResultJsonDir.setText(result_json_dir)
 
     def show(self) -> None:
-        openai_key = self.system("InterfaceGetOpenAIKey")
-        google_palm_key = self.system("InterfaceGetGooglePalmKey")
-        project_root_dir = self.system("InterfaceGetProjectRootDir")
-        result_json_dir = self.system("InterfaceGetResultJsonDir")
+        openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
+        google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
+        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
+        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
 
         self.ui.lineEditOpenAIKey.setText(openai_key)
         self.ui.lineEditGooglePalmKey.setText(google_palm_key)
@@ -51,7 +51,7 @@ class SettingsTab(QDialog):
         return super().show()
 
     def clickOpenResultJsonDir(self):
-        result_json_dir = self.system("InterfaceGetResultJsonDir")
+        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
         if not result_json_dir:
             result_json_dir = "/"
 
@@ -67,7 +67,7 @@ class SettingsTab(QDialog):
             self.ui.lineEditResultJsonDir.setText(folder_path)
 
     def clickOpenFolder(self):
-        project_root_dir = self.system("InterfaceGetProjectRootDir")
+        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
         if not project_root_dir:
             project_root_dir = "/"
 
@@ -94,14 +94,14 @@ class SettingsTab(QDialog):
             else:
                 return None
         else:
-            if self.system("InterfaceIsEmpty"):
+            if self.system.call_settings("InterfaceIsEmpty"):
                 QMessageBox.warning(self, "Warning", "Please set the settings first")
                 return None
             else:
                 return super().accept()
 
     def reject(self) -> None:
-        if self.system("InterfaceIsEmpty"):
+        if self.system.call_settings("InterfaceIsEmpty"):
             QMessageBox.warning(self, "Warning", "Please set the settings first")
             return None
 
@@ -114,7 +114,7 @@ class SettingsTab(QDialog):
             else:
                 return None
         else:
-            if self.system("InterfaceIsEmpty"):
+            if self.system.call_settings("InterfaceIsEmpty"):
                 QMessageBox.warning(self, "Warning", "Please set the settings first")
                 return None
             else:
@@ -126,22 +126,25 @@ class SettingsTab(QDialog):
         project_root_dir = self.ui.lineEditRootDir.text()
         result_json_dir = self.ui.lineEditResultJsonDir.text()
 
-        self.system("InterfaceSetOpenAIKey", openai_key)
-        self.system("InterfaceSetGooglePalmKey", google_palm_key)
-        self.system("InterfaceSetProjectRootDir", project_root_dir)
-        self.system("InterfaceSetResultJsonDir", result_json_dir)
-        self.system("InterfaceSaveConf")
+        self.system.call_settings("InterfaceSetOpenAIKey", openai_key)
+        self.system.call_settings("InterfaceSetGooglePalmKey", google_palm_key)
+        self.system.call_settings("InterfaceSetProjectRootDir", project_root_dir)
+        self.system.call_settings("InterfaceSetResultJsonDir", result_json_dir)
+        self.system.call_settings("InterfaceSaveConf")
 
     def textChanged(self):
-        openai_key = self.system("InterfaceGetOpenAIKey")
-        google_palm_key = self.system("InterfaceGetGooglePalmKey")
-        project_root_dir = self.system("InterfaceGetProjectRootDir")
-        result_json_dir = self.system("InterfaceGetResultJsonDir")
+        openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
+        google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
+        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
+        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
 
         openai_key_text = self.ui.lineEditOpenAIKey.text()  
         google_palm_key_text = self.ui.lineEditGooglePalmKey.text()
         project_root_dir_text = self.ui.lineEditRootDir.text()
         result_json_dir_text = self.ui.lineEditResultJsonDir.text()
+
+        if openai_key != openai_key_text or google_palm_key != google_palm_key_text:
+            self.system.InterfaceRefreshSystem()
 
         if openai_key_text != openai_key or google_palm_key_text != google_palm_key \
                 or project_root_dir_text != project_root_dir or result_json_dir_text != result_json_dir:

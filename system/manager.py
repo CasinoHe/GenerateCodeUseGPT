@@ -73,6 +73,13 @@ class MainManager(object):
         if self.googleai_util.InterfaceIsValid():
             self.api_supply_dict[self.googleai_util.InterfaceGetSupplyName()] = self.call_googleai_util
 
+    def refresh_system(self):
+        '''
+        User may add api-key at runtime, so we need to refresh the system.
+        '''
+        self.api_supply_dict = {}
+        self.init_systems()
+
     @call_system_decorator("settings")
     def call_settings(self, *args, **kwargs):
         return True
@@ -119,3 +126,6 @@ class MainManager(object):
         for api_supply in self.api_supply_dict:
             result[api_supply] = self.call_llm(api_supply, "InterfaceGetAllModelNames")
         return result
+
+    def InterfaceRefreshSystem(self):
+        self.refresh_system()

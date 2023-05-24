@@ -28,7 +28,7 @@ class OpenAIUtil(llm_interface.LLMInterface):
         openai.api_key = self.open_ai_key
 
     def InterfaceIsValid(self):
-        return self.open_ai_key is not None
+        return self.open_ai_key
 
     def InterfaceGetSupplyName(self):
         return "OpenAI"
