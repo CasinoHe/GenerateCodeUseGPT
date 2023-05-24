@@ -7,3 +7,5 @@ build
 # ignore conf.json because it contains sensitive information
 system/settings/config.json
 system/settings/conf.json
+
+dependencies_installed.flag
