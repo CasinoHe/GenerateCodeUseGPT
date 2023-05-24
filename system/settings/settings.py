@@ -80,8 +80,6 @@ class Settings(object):
             json.dump(conf_json, f)
 
     def is_empty(self):
-        if self.project_root_dir == "":
-            return True
         if self.open_ai_key == "" and self.google_palm_key == "":
             return True
 
