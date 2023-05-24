@@ -31,7 +31,7 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         palm.configure(api_key=self.palm_api_key)
 
     def InterfaceIsValid(self):
-        return self.palm_api_key is not None
+        return self.palm_api_key is not None and self.model_list
     
     def InterfaceGetSupplyName(self):
         return "Google"
@@ -48,7 +48,12 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         # and we use a signal to notify the main thread that the models are ready
         # we use a list to store the models, because the thread can't return value
         def get_models(self):
-            model_list = palm.list_models()
+            try:
+                # there maybe some errors when we fetching the model
+                # for example, the api cannot be accessed outside the US
+                model_list = palm.list_models()
+            except Exception as e:
+                return
             self.mutex.acquire()
             self.model_list = model_list
             # save the models name to self.model_name_list
