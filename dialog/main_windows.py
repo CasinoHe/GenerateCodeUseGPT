@@ -17,6 +17,7 @@ class ProductiveAIGCToolWindows(QMainWindow):
         self.ui = generate_windows_ui.Ui_MainWindow()
         self.ui.setupUi(self)
         self.setting_panel = None
+        self.gen_code_panel = None
         self.system = system_manager
 
         self.initUI()
@@ -89,9 +90,9 @@ class ProductiveAIGCToolWindows(QMainWindow):
         '''
         import dialog.generator_with_example_dialog
 
-        if self.setting_panel is None:
-            self.setting_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
-        self.setting_panel.show()
+        if self.gen_code_panel is None:
+            self.gen_code_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
+        self.gen_code_panel.show()
         
     def clickEmbeddings(self):
         '''

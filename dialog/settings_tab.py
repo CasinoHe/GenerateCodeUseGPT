@@ -94,9 +94,17 @@ class SettingsTab(QDialog):
             else:
                 return None
         else:
-            return super().accept()
+            if self.system("InterfaceIsEmpty"):
+                QMessageBox.warning(self, "Warning", "Please set the settings first")
+                return None
+            else:
+                return super().accept()
 
     def reject(self) -> None:
+        if self.system("InterfaceIsEmpty"):
+            QMessageBox.warning(self, "Warning", "Please set the settings first")
+            return None
+
         if self.textChanged():
             # open a confirm dialog to confirm the settings
             reply = QMessageBox.question(self, "Confirm", "Are you sure to discard the settings?",
@@ -106,7 +114,11 @@ class SettingsTab(QDialog):
             else:
                 return None
         else:
-            return super().reject()
+            if self.system("InterfaceIsEmpty"):
+                QMessageBox.warning(self, "Warning", "Please set the settings first")
+                return None
+            else:
+                return super().reject()
 
     def saveSettings(self):
         openai_key = self.ui.lineEditOpenAIKey.text()
