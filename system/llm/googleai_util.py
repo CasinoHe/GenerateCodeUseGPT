@@ -31,7 +31,7 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         palm.configure(api_key=self.palm_api_key)
 
     def InterfaceIsValid(self):
-        return self.palm_api_key and self.model_list
+        return self.palm_api_key
     
     def InterfaceGetSupplyName(self):
         return "Google"
@@ -82,6 +82,9 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         # clear the models
         self.mutex.acquire()
         self.model_list = []
+        self.embedding_models= []
+        self.generate_text_models= []
+        self.generate_message_models = []
         self.model_name_list = []
         self.mutex.release()
 

@@ -177,6 +177,10 @@ class GeneratorWithExampleDialog(QDialog):
         self.ui.pushButtonSendPrompt.clicked.connect(self.clickSendPrompt)
         # connect supply name combo box change
         self.ui.comboBoxSupplyName.currentIndexChanged.connect(self.changeSupplyName)
+        # connect supply name combo box when user click it
+        self.ui.comboBoxSupplyName.activated.connect(self.clickSupplyName)
+        # connect model name combo box when user click it
+        self.ui.comboBoxModel.activated.connect(self.clickModelComboBox)
 
         # we cannot modify the result, so we disable the result plain text edit
         self.ui.plainTextEditResult.setReadOnly(True)
@@ -184,8 +188,12 @@ class GeneratorWithExampleDialog(QDialog):
         self.initModelComboBox()
 
     def initModelComboBox(self):
+        # clear supply name combo box and model combo box, because the api may be changed at runtime
+        self.ui.comboBoxModel.clear()
+        self.ui.comboBoxSupplyName.clear()
+
         # get model list from llm interface
-        model_dict = self.system.get_all_models()
+        model_dict = self.system.InterfaceGetAllModels()
 
         # # initialize the timer
         self.timer = None
@@ -214,15 +222,48 @@ class GeneratorWithExampleDialog(QDialog):
         # add model list to combobox
         self.ui.comboBoxModel.addItems(model_list)
         self.ui.comboBoxSupplyName.addItems(supplys)
+    
+    def clickModelComboBox(self):
+        # if there is no model's name in models combo box, request the model's name from llm interface
+        if self.ui.comboBoxModel.count() > 0:
+            return
+
+        self.clickSupplyName()
+
+    def clickSupplyName(self):
+        # get supply name
+        supply = self.ui.comboBoxSupplyName.currentText()
+
+        # if there is no model's name in models combo box, request the model's name from llm interface
+        if self.ui.comboBoxModel.count() > 0:
+            return
+
+        # get model list from llm interface
+        model_dict = self.system.InterfaceGetAllModels()
+
+        # clear model combobox
+        self.ui.comboBoxModel.clear()
+
+        if supply not in model_dict:
+            return
+
+        model_list = model_dict[supply]
+        # add model list to combobox
+        self.ui.comboBoxModel.addItems(model_list)
 
     def changeSupplyName(self, index):
         # get supply name
         supply = self.ui.comboBoxSupplyName.currentText()
         # get model list from llm interface
-        model_dict = self.system.get_all_models()
-        model_list = model_dict[supply]
+        model_dict = self.system.InterfaceGetAllModels()
+
         # clear model combobox
         self.ui.comboBoxModel.clear()
+
+        if supply not in model_dict:
+            return
+        model_list = model_dict[supply]
+
         # add model list to combobox
         self.ui.comboBoxModel.addItems(model_list)
 

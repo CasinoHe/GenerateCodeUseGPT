@@ -92,6 +92,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
 
         if self.gen_code_panel is None:
             self.gen_code_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
+        else:
+            self.gen_code_panel.initModelComboBox()
         self.gen_code_panel.show()
         
     def clickEmbeddings(self):

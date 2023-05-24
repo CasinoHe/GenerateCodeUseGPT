@@ -147,9 +147,6 @@ class SettingsTab(QDialog):
         project_root_dir_text = self.ui.lineEditRootDir.text()
         result_json_dir_text = self.ui.lineEditResultJsonDir.text()
 
-        if openai_key != openai_key_text or google_palm_key != google_palm_key_text:
-            self.system.InterfaceRefreshSystem()
-
         if openai_key_text != openai_key or google_palm_key_text != google_palm_key \
                 or project_root_dir_text != project_root_dir or result_json_dir_text != result_json_dir:
             return True

@@ -59,6 +59,7 @@ class MainManager(object):
         super().__init__()
         self.api_supply_dict = {}
         self.init_systems()
+        self.settings_dirty = False
 
     def init_systems(self):
 
@@ -82,6 +83,7 @@ class MainManager(object):
 
     @call_system_decorator("settings")
     def call_settings(self, *args, **kwargs):
+        self.settings_dirty = True
         return True
 
     @call_system_decorator("openai_util")
@@ -115,17 +117,17 @@ class MainManager(object):
             func_kwargs = {k: v for k, v in kwargs.items() if k != 'supply'}
             return self.api_supply_dict[supply](*args[1:], **func_kwargs)
 
-    def get_all_models(self):
+    def InterfaceGetAllModels(self):
         """
         Get all the models of the system.
 
         Returns:
             A dict of all the models of the system.
         """
+        if self.settings_dirty:
+            self.refresh_system()
+            self.settings_dirty = False
         result = {}
         for api_supply in self.api_supply_dict:
             result[api_supply] = self.call_llm(api_supply, "InterfaceGetAllModelNames")
         return result
-
-    def InterfaceRefreshSystem(self):
-        self.refresh_system()
