@@ -4,7 +4,7 @@
 #   1. prepare data in config.json, including example files, prompt file, openai api key
 #   2. main.py will read config.json and all examples, prompts, then send request to openai api
 
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 import dialog.main_windows
 import system.manager

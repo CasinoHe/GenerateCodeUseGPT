@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Purpose: settings tab
 
-from PyQt6.QtWidgets import QDialog, QFileDialog, QMessageBox
-from PyQt6.QtCore import QUrl
-from PyQt6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
 
 
 import ui.settings_ui

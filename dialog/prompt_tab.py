@@ -2,9 +2,8 @@
 # author: CasinoHe
 # Purpose: the dialog of prompt tab
 
-from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox
+from PySide6.QtWidgets import QWidget, QFileDialog, QMessageBox
 from ui import prompt_tab_ui
-import json
 
 class PromptTab(QWidget):
     def __init__(self, parent):

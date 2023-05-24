@@ -9,7 +9,7 @@ def convert_ui_to_py(ui_file_path, py_file_path):
     '''
     convert .ui file to .py file using pyuic6
     '''
-    cmd = 'pyuic6 -x {} -o {}'.format(ui_file_path, py_file_path)
+    cmd = 'pyside6-uic {} -o {}'.format(ui_file_path, py_file_path)
     # output some information
     print('convert {} to {}'.format(ui_file_path, py_file_path))
     subprocess.call(cmd, shell=True)

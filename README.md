@@ -3,7 +3,7 @@
 ## overview
 
 This repository contains a tool to generate code using openai api-key.
-This tool is written in python and use PyQt6 for the GUI.
+This tool is written in python and use PySide6 for the GUI.
 
 First gui view:
 ![first view](Screenshot.png)

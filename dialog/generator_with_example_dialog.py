@@ -3,10 +3,10 @@
 # Purpose:
 #    Create a GUI dialog to generate code, So it's easy to use
 
-# using PyQt6 to create a GUI dialog
-from PyQt6.QtWidgets import QDialog, QMessageBox, QFileDialog, QApplication
-from PyQt6.QtCore import QTimer 
-from PyQt6 import QtGui
+# using PySide6 to create a GUI dialog
+from PySide6.QtWidgets import QDialog, QMessageBox, QFileDialog, QApplication
+from PySide6.QtCore import QTimer 
+from PySide6 import QtGui
 from ui import generate_dialog_ui
 import threading
 from dialog import example_tab

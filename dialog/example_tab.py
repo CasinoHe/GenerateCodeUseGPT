@@ -2,7 +2,7 @@
 # author: CasinoHe
 # Purpose: the dialog of example tab
 
-from PyQt6.QtWidgets import QWidget, QFileDialog, QMessageBox
+from PySide6.QtWidgets import QWidget, QFileDialog, QMessageBox
 from ui import example_tab_ui
 
 class ExampleTab(QWidget):

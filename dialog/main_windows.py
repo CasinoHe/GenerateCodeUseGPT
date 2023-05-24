@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*_
-# purpose: a windows that based on PyQt6
+# purpose: a windows that based on PySide6
 
 
-from PyQt6.QtWidgets import QMainWindow
-from PyQt6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtGui import QAction
 from ui import generate_windows_ui
 
 class ProductiveAIGCToolWindows(QMainWindow):
     '''
-    ProductiveAIGCToolWindows is a windows that based on PyQt6
+    ProductiveAIGCToolWindows is a windows that based on PySide6
     '''
     def __init__(self, system_manager, parent=None):
         super(ProductiveAIGCToolWindows, self).__init__(parent)
