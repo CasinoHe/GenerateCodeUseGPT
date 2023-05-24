@@ -45,7 +45,10 @@ class OpenAIUtil(llm_interface.LLMInterface):
         # and we use a signal to notify the main thread that the models are ready
         # we use a list to store the models, because the thread can't return value
         def get_models(self):
-            model_list = openai.Engine.list()
+            try:
+                model_list = openai.Engine.list()
+            except Exception as e:
+                return
             self.mutex.acquire()
             self.model_list = model_list
             # save the models name to self.model_name_list
