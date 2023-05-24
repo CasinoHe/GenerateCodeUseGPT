@@ -98,7 +98,11 @@ class SettingsTab(QDialog):
             else:
                 return None
         else:
-            return super().accept()
+            if self.system.call_settings("InterfaceIsEmpty"):
+                QMessageBox.warning(self, "Warning", "Please set at least one api settings first")
+                return None
+            else:
+                return super().accept()
 
     def reject(self) -> None:
         if self.system.call_settings("InterfaceIsEmpty"):
