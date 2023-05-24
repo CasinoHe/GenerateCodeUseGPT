@@ -5,7 +5,6 @@
 from system.llm import llm_interface
 import openai
 import threading
-import number_parser
 
 
 class OpenAIUtil(llm_interface.LLMInterface):
@@ -13,7 +12,8 @@ class OpenAIUtil(llm_interface.LLMInterface):
         super().__init__()
         self.open_ai_key = openai_key
 
-        self.thread_pool = []
+        self.request_name_thread = None
+        self.request_chat_thread = None
         self.model_list = []
         self.model_name_list = []
         self.mutex = threading.Lock()
@@ -57,9 +57,8 @@ class OpenAIUtil(llm_interface.LLMInterface):
             self.mutex.release()
         
         # start a thread to get the models
-        t = threading.Thread(target=get_models, args=(self,))
-        t.start()
-        self.thread_pool.append(t)
+        self.request_name_thread = threading.Thread(target=get_models, args=(self,))
+        self.request_name_thread.start()
 
     def InterfaceGetAllModelNames(self):
         # get the models name
@@ -89,6 +88,11 @@ class OpenAIUtil(llm_interface.LLMInterface):
         prompts = kwargs.get('prompts', '')
         examples = kwargs.get('examples', [])
         callback = kwargs.get('callback', None)
+
+        if self.request_chat_thread and self.request_chat_thread.is_alive():
+            if callback is not None:
+                callback("The previous request is not completed, please wait.")
+                callback("")
 
         if not prompts:
             if callback:
@@ -134,15 +138,21 @@ class OpenAIUtil(llm_interface.LLMInterface):
                     print(chunk_message)
 
         # start a thread to get the response
-        t = threading.Thread(target=get_response, args=(self, model, temperature, messages, callback))
-        t.start()
-        self.thread_pool.append(t)
+        self.request_chat_thread = threading.Thread(target=get_response, args=(self, model, temperature, messages, callback))
+        self.request_chat_thread.start()
 
     # when delete the object, we need to stop all the threads
     def __del__(self):
-        for t in self.thread_pool:
-            t.join()
-        self.thread_pool = []
+        self.request_chat_thread = None
+        self.request_name_thread = None
+
+    def make_ordinal(self, n):
+        n = int(n)
+        if 11 <= (n % 100) <= 13:
+            suffix = 'th'
+        else:
+            suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+        return str(n) + suffix
 
     def _build_message(self, prompts, examples):
         # the system information in the last prompt is the system information send to openai
@@ -162,7 +172,7 @@ class OpenAIUtil(llm_interface.LLMInterface):
         if examples:
             index = 1
             for example in examples:
-                order = number_parser.parse_ordinal(str(index))
+                order = self.make_ordinal(index)
                 if example['desc']:
                     messages.append({'role': 'user', 'content': '''This is {} example, the description is: {}, the example is: {}'''.format(order, example['desc'], example["content"])}) 
                 else:

@@ -12,6 +12,7 @@ class Settings(object):
         self.open_ai_key = ""
         self.google_palm_key = ""
         self.project_root_dir = ""
+        self.result_json_dir = ""
 
         self.init_conf_file()
 
@@ -50,10 +51,14 @@ class Settings(object):
         if 'project_root_dir' in conf_json:
             self.project_root_dir = conf_json['project_root_dir']
 
+        if 'result_json_dir' in conf_json:
+            self.result_json_dir = conf_json['result_json_dir']
+
     def pack_conf(self, conf_json):
         conf_json['openai_api_key'] = self.open_ai_key
         conf_json['google_palm_key'] = self.google_palm_key
         conf_json['project_root_dir'] = self.project_root_dir
+        conf_json['result_json_dir'] = self.result_json_dir
 
     def save_conf(self):
         '''
@@ -137,3 +142,18 @@ class Settings(object):
         get the project root dir
         '''
         return self.project_root_dir
+
+    def InterfaceSetResultJsonDir(self, dir):
+        '''
+        Interface, called outside
+        set the result json dir
+        '''
+        self.result_json_dir = dir
+        self.save_conf()
+
+    def InterfaceGetResultJsonDir(self):
+        '''
+        Interface, called outside
+        get the result json dir
+        '''
+        return self.result_json_dir

@@ -26,24 +26,45 @@ class SettingsTab(QDialog):
         self.ui.pushButtonOpenFolder.clicked.connect(self.clickOpenFolder)
         self.ui.pushButtonApplyOpenAIKey.clicked.connect(self.clickApplyOpenAIKey)
         self.ui.pushButtonApplyGooglePalmKey.clicked.connect(self.clickApplyGooglePalmKey)
+        self.ui.pushButtonOpenResultJsonDir.clicked.connect(self.clickOpenResultJsonDir)
 
         openai_key = self.system("InterfaceGetOpenAIKey")
         google_palm_key = self.system("InterfaceGetGooglePalmKey")
         project_root_dir = self.system("InterfaceGetProjectRootDir")
+        result_json_dir = self.system("InterfaceGetResultJsonDir")
 
         self.ui.lineEditOpenAIKey.setText(openai_key)
         self.ui.lineEditGooglePalmKey.setText(google_palm_key)
         self.ui.lineEditRootDir.setText(project_root_dir)
+        self.ui.lineEditResultJsonDir.setText(result_json_dir)
 
     def show(self) -> None:
         openai_key = self.system("InterfaceGetOpenAIKey")
         google_palm_key = self.system("InterfaceGetGooglePalmKey")
         project_root_dir = self.system("InterfaceGetProjectRootDir")
+        result_json_dir = self.system("InterfaceGetResultJsonDir")
 
         self.ui.lineEditOpenAIKey.setText(openai_key)
         self.ui.lineEditGooglePalmKey.setText(google_palm_key)
         self.ui.lineEditRootDir.setText(project_root_dir)
+        self.ui.lineEditResultJsonDir.setText(result_json_dir)
         return super().show()
+
+    def clickOpenResultJsonDir(self):
+        result_json_dir = self.system("InterfaceGetResultJsonDir")
+        if not result_json_dir:
+            result_json_dir = "/"
+
+        # get settings file path
+        folder_path = QFileDialog.getExistingDirectory(self, "Set Result Json Folder", result_json_dir)
+        if not folder_path:
+            display_text = self.ui.lineEditResultJsonDir.text()
+            if not display_text:
+                # use QMessageBox to display a warning
+                QMessageBox.warning(self, "Warning", "Please select the result json folder")
+                return
+        else:
+            self.ui.lineEditResultJsonDir.setText(folder_path)
 
     def clickOpenFolder(self):
         project_root_dir = self.system("InterfaceGetProjectRootDir")
@@ -91,22 +112,27 @@ class SettingsTab(QDialog):
         openai_key = self.ui.lineEditOpenAIKey.text()
         google_palm_key = self.ui.lineEditGooglePalmKey.text()
         project_root_dir = self.ui.lineEditRootDir.text()
+        result_json_dir = self.ui.lineEditResultJsonDir.text()
 
         self.system("InterfaceSetOpenAIKey", openai_key)
         self.system("InterfaceSetGooglePalmKey", google_palm_key)
         self.system("InterfaceSetProjectRootDir", project_root_dir)
+        self.system("InterfaceSetResultJsonDir", result_json_dir)
         self.system("InterfaceSaveConf")
 
     def textChanged(self):
         openai_key = self.system("InterfaceGetOpenAIKey")
         google_palm_key = self.system("InterfaceGetGooglePalmKey")
         project_root_dir = self.system("InterfaceGetProjectRootDir")
+        result_json_dir = self.system("InterfaceGetResultJsonDir")
 
         openai_key_text = self.ui.lineEditOpenAIKey.text()  
         google_palm_key_text = self.ui.lineEditGooglePalmKey.text()
         project_root_dir_text = self.ui.lineEditRootDir.text()
+        result_json_dir_text = self.ui.lineEditResultJsonDir.text()
 
-        if openai_key_text != openai_key or google_palm_key_text != google_palm_key or project_root_dir_text != project_root_dir:
+        if openai_key_text != openai_key or google_palm_key_text != google_palm_key \
+                or project_root_dir_text != project_root_dir or result_json_dir_text != result_json_dir:
             return True
         else:
             return False

@@ -38,6 +38,27 @@
       </layout>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Result Json Dir: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditResultJsonDir"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonOpenResultJsonDir">
+         <property name="text">
+          <string>Open Folder...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLabel" name="label_2">
@@ -78,9 +99,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5"/>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">

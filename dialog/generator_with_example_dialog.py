@@ -238,8 +238,9 @@ class GeneratorWithExampleDialog(QDialog):
 
     def clickSaveInfo(self):
         '''save all info to a json file, so we can use it to generate code again'''
+        opendir = self.system.call_settings("InterfaceGetResultJsonDir")
         # open a file dialog to select a file
-        save_file, _ = QFileDialog.getSaveFileName(self, "Save Query Info", "", "Json Files (*.json)")
+        save_file, _ = QFileDialog.getSaveFileName(self, "Save Query Info", opendir, "Json Files (*.json)")
         if not save_file:
             return
 
@@ -303,8 +304,9 @@ class GeneratorWithExampleDialog(QDialog):
 
     def clickLoadInfo(self):
         '''load all info from a json file'''
+        opendir = self.system.call_settings("InterfaceGetResultJsonDir")
         # open a file dialog to select a file
-        load_file, _ = QFileDialog.getOpenFileName(self, "Load Query Info", "", "Json Files (*.json)")
+        load_file, _ = QFileDialog.getOpenFileName(self, "Load Query Info", opendir, "Json Files (*.json)")
         if not load_file:
             return
 
@@ -425,7 +427,8 @@ class GeneratorWithExampleDialog(QDialog):
             }
             prompts.append(element)
 
-        estimate_token, prompt_cost, complete_cost = self.llm_interface.InterfaceGetEstimateCost(model=model, examples=examples, prompts=prompts)
+        supply_name = self.ui.comboBoxSupplyName.currentText()
+        estimate_token, prompt_cost, complete_cost = self.system.call_llm(supply_name, "InterfaceGetEstimateCost", model=model, examples=examples, prompts=prompts)
         # use confirm message box to confirm the cost
         confirm_message = "This request will cost {} tokens, prompt cost is ${}, estimate of complete cost base on the token amount of prompt is ${}, continue?".format(estimate_token, prompt_cost, complete_cost)
         reply = QMessageBox.question(self, "Confirm", confirm_message, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
@@ -439,15 +442,16 @@ class GeneratorWithExampleDialog(QDialog):
         self.initGenerateResult()
 
         # we need a lambda function to call onGenerateResultAppend
-        callback = lambda result: self.onGenerateResultAppend(result)
+        callback = lambda result, reason = None: self.onGenerateResultAppend(result, reason)
+
         # send request to llm interface
-        self.llm_interface.llm_request(model=model, temperature=temperature, examples=examples, prompts=prompts, callback=callback)
+        self.system.call_llm(supply_name, "InterfaceChatRequest", model=model, temperature=temperature, examples=examples, prompts=prompts, callback=callback)
 
     def onGenerateResult(self, result):
         # show result in plainTextEditResult
         self.ui.plainTextEditResult.setPlainText(result)
 
-    def onGenerateResultAppend(self, result):
+    def onGenerateResultAppend(self, result, reason):
         # if result is empty, we call onGenerateResultCompleted
         if not result:
             self.result_update_mutex.acquire()

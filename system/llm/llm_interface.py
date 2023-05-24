@@ -2,6 +2,12 @@
 # Purpose: abstract interface for all aigc api
 
 class LLMInterface(object):
+
+    class ReasonCode(object):
+        SUCCESS = 0
+        FAILED = 1
+        NEW_REPLY = 2
+
     def __init__(self):
         pass
 

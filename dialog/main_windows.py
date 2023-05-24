@@ -36,6 +36,7 @@ class ProductiveAIGCToolWindows(QMainWindow):
         '''
 
         # Settings menu
+        self.initEmbeddingsMenu()
         self.initGeneratorMenu()
         self.initSettingsMenu()
 
@@ -50,6 +51,12 @@ class ProductiveAIGCToolWindows(QMainWindow):
         new_action = QAction("Generator with Example", self)
         new_menu.addAction(new_action)
         new_action.triggered.connect(self.clickGeneratorWithExample)
+
+    def initEmbeddingsMenu(self):
+        new_menu = self.ui.menubar.addMenu("Embeddings")
+        new_action = QAction("Create Embeddings", self)
+        new_menu.addAction(new_action)
+        new_action.triggered.connect(self.clickEmbeddings)
 
     def clickSettings(self):
         '''
@@ -75,3 +82,13 @@ class ProductiveAIGCToolWindows(QMainWindow):
             self.setting_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
         self.setting_panel.show()
         
+    def clickEmbeddings(self):
+        '''
+        clickEmbeddings will show a dialog to set the parameters of AIGC
+        '''
+        # import dialog.embedding_dialog
+
+        # if self.setting_panel is None:
+        #     self.setting_panel = dialog.embedding_dialog.EmbeddingDialog(self)
+        # self.setting_panel.show()
+        pass
