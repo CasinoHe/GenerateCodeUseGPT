@@ -2,9 +2,9 @@
 # purpose: a windows that based on PySide6
 
 
-from PySide6.QtWidgets import QMainWindow, QFileSystemModel
+from PySide6.QtWidgets import QMainWindow, QFileSystemModel, QMenu
 from PySide6.QtGui import QAction
-from PySide6.QtCore import QDir
+from PySide6.QtCore import QDir, Qt
 from ui import generate_windows_ui
 import os
 
@@ -23,6 +23,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
         self.system = system_manager
         self.result_path = ""
         self.project_path = ""
+        self.project_model = None
+        self.result_model = None
 
         self.initUI()
 
@@ -125,12 +127,15 @@ class ProductiveAIGCToolWindows(QMainWindow):
         
         self.result_path = result_path
         tree_view = self.ui.treeViewResultDir
-        self.model = QFileSystemModel()
+        self.result_model = QFileSystemModel()
         result_dir = QDir(result_path)
-        self.model.setRootPath(result_dir.absolutePath())
-        tree_view.setModel(self.model)
-        tree_view.setRootIndex(self.model.index(result_dir.absolutePath()))
+        self.result_model.setRootPath(result_dir.absolutePath())
+        tree_view.setModel(self.result_model)
+        tree_view.setRootIndex(self.result_model.index(result_dir.absolutePath()))
         tree_view.setColumnWidth(0, 200)
+        tree_view.setContextMenuPolicy(Qt.CustomContextMenu) # type: ignore
+        tree_view.customContextMenuRequested.connect(self.resultDirectoryContextMenu)
+        tree_view.doubleClicked.connect(lambda index: self.clickOpenResultFile(index, ""))
 
     def initProjectRootDirectoryView(self):
         project_path = self.system.call_settings("InterfaceGetProjectRootDir")
@@ -142,9 +147,82 @@ class ProductiveAIGCToolWindows(QMainWindow):
 
         self.project_path = project_path
         tree_view = self.ui.treeViewProjectRootDir
-        self.model = QFileSystemModel()
+        self.project_model = QFileSystemModel()
         project_dir = QDir(project_path)
-        self.model.setRootPath(project_dir.absolutePath())
-        tree_view.setModel(self.model)
-        tree_view.setRootIndex(self.model.index(project_dir.absolutePath()))
+        self.project_model.setRootPath(project_dir.absolutePath())
+        tree_view.setModel(self.project_model)
+        tree_view.setRootIndex(self.project_model.index(project_dir.absolutePath()))
         tree_view.setColumnWidth(0, 200)
+        tree_view.setContextMenuPolicy(Qt.CustomContextMenu) # type: ignore
+        tree_view.customContextMenuRequested.connect(self.projectDirectoryContextMenu)
+        tree_view.doubleClicked.connect(lambda index: self.clickOpenProjectFile(index, ""))
+
+    def resultDirectoryContextMenu(self, point):
+        index = self.ui.treeViewResultDir.indexAt(point)
+        if not index.isValid():
+            return
+
+        file_path = self.result_model.filePath(index) # type:ignore 
+
+        menu = QMenu()
+        open_action = QAction("Open", self)
+        open_action.triggered.connect(lambda index: self.clickOpenResultFile(index, file_path))
+        menu.addAction(open_action)
+        generate_action = QAction("Load and Generate", self)
+        generate_action.triggered.connect(lambda index: self.clickGenerateWithResult(index, file_path))
+        menu.addAction(generate_action)
+        menu.exec_(self.ui.treeViewResultDir.mapToGlobal(point))
+
+    def openFileOnEditor(self, file_path):
+        # clear the text editor
+        self.ui.plainTextEdit.clear()
+        # get content of the file, and show it in the text editor
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            self.ui.plainTextEdit.setPlainText(content)
+
+    def clickOpenResultFile(self, index, file_path):
+        self.openFileOnEditor(file_path)
+
+    def clickGenerateWithResult(self, index, file_path):
+        # open generate code panel
+        import dialog.generator_with_example_dialog
+
+        if self.gen_code_panel is None:
+            self.gen_code_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
+        else:
+            self.gen_code_panel.initModelComboBox()
+        self.gen_code_panel.loadResultFileDirectly(file_path)
+        self.gen_code_panel.show()
+
+    def projectDirectoryContextMenu(self, point):
+        index = self.ui.treeViewProjectRootDir.indexAt(point)
+        if not index.isValid():
+            return
+
+        file_path = self.project_model.filePath(index) # type:ignore 
+
+        menu = QMenu()
+        open_action = QAction("Open", self)
+        open_action.triggered.connect(lambda index: self.clickOpenProjectFile(index, file_path))
+        menu.addAction(open_action)
+        generate_action = QAction("Generate as example", self)
+        generate_action.triggered.connect(lambda index: self.clickGenerateWithExample(index, file_path))
+        menu.addAction(generate_action)
+        menu.exec_(self.ui.treeViewProjectRootDir.mapToGlobal(point))
+
+    def clickOpenProjectFile(self, index, file_path):
+        if not file_path:
+            file_path = self.project_model.filePath(index) # type: ignore
+        self.openFileOnEditor(file_path)
+
+    def clickGenerateWithExample(self, index, file_path):
+        # open generate code panel
+        import dialog.generator_with_example_dialog
+
+        if self.gen_code_panel is None:
+            self.gen_code_panel = dialog.generator_with_example_dialog.GeneratorWithExampleDialog(self)
+        else:
+            self.gen_code_panel.initModelComboBox()
+        self.gen_code_panel.loadExampleFileDirectly(file_path)
+        self.gen_code_panel.show()

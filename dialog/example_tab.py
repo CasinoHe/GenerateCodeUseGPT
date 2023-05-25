@@ -35,15 +35,17 @@ class ExampleTab(QWidget):
         if len(filepath[0]) <= 0:
             return
 
+        self.loadExampleFileDirectly(filepath[0])
+
+    def loadExampleFileDirectly(self, file_path):
         # set file path to lineEdit
-        self.ui.lineEditExample.setText(filepath[0])
+        self.ui.lineEditExample.setText(file_path)
+        # read file content to plainTextEdit and refresh it
+        with open(file_path, "r", encoding='utf-8') as f:
+            self.ui.plainTextEdit.setPlainText(f.read())
 
         # enable refresh button
         self.ui.pushButtonRefresh.setEnabled(True)
-
-        # read file content to plainTextEdit and refresh it
-        with open(filepath[0], "r", encoding='utf-8') as f:
-            self.ui.plainTextEdit.setPlainText(f.read())
         self.open_example_callback()
 
     def clickRefreshExample(self):

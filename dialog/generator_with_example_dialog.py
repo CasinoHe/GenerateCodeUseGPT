@@ -348,6 +348,9 @@ class GeneratorWithExampleDialog(QDialog):
         if not load_file:
             return
 
+        self.loadResultFileDirectly(load_file)
+
+    def loadResultFileDirectly(self, load_file):
         # load json file
         example_info, prompt_info, generate_info, result_info = self.system.call_database(
             "InterfaceLoadResultFile", load_file)
@@ -580,3 +583,8 @@ class GeneratorWithExampleDialog(QDialog):
         self.ui.tabWidgetPrompt.setCurrentIndex(self.ui.tabWidgetPrompt.count() - 2)
         prompt_tab = self.prompt_tabs[-2]
         prompt_tab.setFocusResponseContent()
+
+    def loadExampleFileDirectly(self, file_path):
+        # get example tab
+        example_tab = self.example_tabs[-1]
+        example_tab.loadExampleFileDirectly(file_path)
