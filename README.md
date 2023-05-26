@@ -23,7 +23,7 @@ First gui view:
 
 1. Double click the start_windows.bat on windows or start_windows.sh on linux
 2. The .bat or .sh file will install the required modules using pip and then start the gui. If you don't have python3 or pip, you can install it from [python.org](https://www.python.org/downloads/)
-3. Once you see the gui for the first time, a settings dialog will appear as shown below: ![settings](instructions/settings.png)
+3. Once you see the gui for the first time, a settings dialog will appear as shown below: ![settings](instructions/Settings.png)
   Settings panel explaination:
     - Project Root Dir: Set the root directory path of your project, which is convenient for searching api and finding example for generating code. Your code or text will not be uploaded to OpenAI's api or Google's API until you generate the code or text using them actually.
     - Result Json Dir: Set the save directory path of the genereted code or text. The result file will save all information that can generate the result, including the prompt, the example, the model, the temperature, the generated code or text, etc.

@@ -23,7 +23,7 @@
 
 1. 在windows双击start_windows.bat或在linux上执行start_windows.sh
 2. .bat或.sh文件将使用pip安装所需的模块，然后启动gui。如果您没有安装python3或pip，您可以从[python.org](https://www.python.org/downloads/)安装。
-3. 第一次看到图形用户界面时，会出现一个设置对话框，如下所示：![settings](instructions/settings.png)
+3. 第一次看到图形用户界面时，会出现一个设置对话框，如下所示：![settings](instructions/Settings.png)
    设置面板说明：
      - Project Root Dir：设置项目的根目录路径，方便查找api和生成代码的example。 在您实际使用OpenAI api或者Google api生成代码或文本之前，您的代码或文本不会上传。
      - Result Json Dir：设置生成的代码或文本的保存目录路径。结果文件将保存所有可以生成结果的信息，包括提示、示例、模型、温度、生成的代码或文本等。
