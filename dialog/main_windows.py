@@ -86,6 +86,7 @@ class ProductiveAIGCToolWindows(QMainWindow):
         if self.setting_panel is None:
             self.setting_panel = dialog.settings_tab.SettingsTab(self)
         self.setting_panel.show()
+        self.setting_panel.exec()
         self.initProjectRootDirectoryView()
         self.initResultDirectoryView()
 

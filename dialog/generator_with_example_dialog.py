@@ -38,6 +38,7 @@ class GeneratorWithExampleDialog(QDialog):
         self.result_update_mutex = threading.Lock()
         self.result_completed = False
         self.initUI()
+        self.setModal(True)
 
     def initUI(self):
         # init the exmpale file part

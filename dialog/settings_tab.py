@@ -18,6 +18,8 @@ class SettingsTab(QDialog):
         # init ui
         self.ui = ui.settings_ui.Ui_Dialog()
         self.ui.setupUi(self)
+        # set modal
+        self.setModal(True)
 
         self.initUI()
 
