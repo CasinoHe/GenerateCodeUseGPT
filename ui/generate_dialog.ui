@@ -347,6 +347,12 @@
                        </item>
                        <item>
                         <widget class="QComboBox" name="comboBoxModel">
+                         <property name="minimumSize">
+                          <size>
+                           <width>90</width>
+                           <height>0</height>
+                          </size>
+                         </property>
                          <property name="toolTip">
                           <string extracomment="Choose which model to use, for example, GPT-4"/>
                          </property>
@@ -355,6 +361,9 @@
                          </property>
                          <property name="whatsThis">
                           <string extracomment="Choose which model to use, for example, GPT-4"/>
+                         </property>
+                         <property name="inputMethodHints">
+                          <set>Qt::ImhNone</set>
                          </property>
                         </widget>
                        </item>

@@ -5,7 +5,7 @@
 
 # using PySide6 to create a GUI dialog
 from PySide6.QtWidgets import QDialog, QMessageBox, QFileDialog, QApplication
-from PySide6.QtCore import QTimer 
+from PySide6.QtCore import QTimer, Qt
 from PySide6 import QtGui
 from ui import generate_dialog_ui
 import threading
@@ -223,6 +223,12 @@ class GeneratorWithExampleDialog(QDialog):
         # add model list to combobox
         if model_list:
             self.ui.comboBoxModel.addItems(model_list)
+
+            model = self.ui.comboBoxModel.model()
+            for i in range(model.rowCount()):
+                hint_text = model.item(i).text() # type: ignore
+                model.setData(model.index(i, 0), hint_text, Qt.ToolTipRole) # type: ignore
+
         self.ui.comboBoxSupplyName.addItems(supplys)
     
     def clickModelComboBox(self):
@@ -252,7 +258,7 @@ class GeneratorWithExampleDialog(QDialog):
         model_list = model_dict[supply]
         # add model list to combobox
         self.ui.comboBoxModel.addItems(model_list)
-
+        
     def changeSupplyName(self, index):
         # get supply name
         supply = self.ui.comboBoxSupplyName.currentText()
@@ -268,6 +274,10 @@ class GeneratorWithExampleDialog(QDialog):
 
         # add model list to combobox
         self.ui.comboBoxModel.addItems(model_list)
+        model = self.ui.comboBoxModel.model()
+        for i in range(model.rowCount()):
+            hint_text = model.item(i).text() # type: ignore
+            model.setData(model.index(i, 0), hint_text, Qt.ToolTipRole) # type: ignore
 
     def clickCopyResult(self):
         # copy the text in plainTextEditResult to clipboard

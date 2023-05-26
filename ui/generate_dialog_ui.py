@@ -246,7 +246,9 @@ class Ui_Dialog(object):
 
         self.comboBoxModel = QComboBox(self.groupBoxResult)
         self.comboBoxModel.setObjectName(u"comboBoxModel")
+        self.comboBoxModel.setMinimumSize(QSize(90, 0))
         self.comboBoxModel.setToolTipDuration(1)
+        self.comboBoxModel.setInputMethodHints(Qt.ImhNone)
 
         self.horizontalLayout_4.addWidget(self.comboBoxModel)
 
