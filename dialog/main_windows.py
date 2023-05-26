@@ -61,7 +61,7 @@ class ProductiveAIGCToolWindows(QMainWindow):
         new_menu = self.ui.menubar.addMenu("Generate")
         new_action = QAction("Generate with Example", self)
         new_menu.addAction(new_action)
-        new_action.triggered.connect(self.clickGeneratorWithExample)
+        new_action.triggered.connect(self.clickOpenGenerateWithExamplePanel)
 
     def initEmbeddingsMenu(self):
         new_menu = self.ui.menubar.addMenu("Embeddings")
@@ -95,9 +95,9 @@ class ProductiveAIGCToolWindows(QMainWindow):
             self.clickSettings()
             return False
 
-    def clickGeneratorWithExample(self):
+    def clickOpenGenerateWithExamplePanel(self):
         '''
-        clickGeneratorWithExample will show a dialog to set the parameters of AIGC
+        clickOpenGenerateWithExamplePanel will show a dialog to set the parameters of AIGC
         '''
         import dialog.generator_with_example_dialog
 
@@ -183,6 +183,8 @@ class ProductiveAIGCToolWindows(QMainWindow):
             self.ui.plainTextEdit.setPlainText(content)
 
     def clickOpenResultFile(self, index, file_path):
+        if not file_path:
+            file_path = self.result_model.filePath(index) # type: ignore
         self.openFileOnEditor(file_path)
 
     def clickGenerateWithResult(self, index, file_path):

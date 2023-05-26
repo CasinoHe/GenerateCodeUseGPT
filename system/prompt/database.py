@@ -45,9 +45,9 @@ class ResultDatabase(object):
     def save_generate_result(self, examples, prompts, generators, results, filepath):
         save_dict = {
             "examples": examples,
-            "prompts": prompts,
+            "prompt": prompts,
             "generate": generators,
-            "results": results
+            "result": results
         }
 
         with open(filepath, 'w', encoding='utf-8') as f:
