@@ -11,8 +11,9 @@ from ui import generate_dialog_ui
 import threading
 from dialog import example_tab
 from dialog import prompt_tab
-import json
 import copy
+from system.llm import llm_interface
+
 
 class GeneratorWithExampleDialog(QDialog):
     '''
@@ -37,6 +38,7 @@ class GeneratorWithExampleDialog(QDialog):
         self.result_update_timer = QTimer(self)
         self.result_update_mutex = threading.Lock()
         self.result_completed = False
+        self.last_chat_request = None
         self.initUI()
         self.setModal(True)
 
@@ -509,8 +511,17 @@ class GeneratorWithExampleDialog(QDialog):
         # we need a lambda function to call onGenerateResultAppend
         callback = lambda result, reason = None: self.onGenerateResultAppend(result, reason)
 
+        current_request = {
+            "examples": examples,
+            "prompts": prompts,
+        }
+        new_chat = self.isNewChat(self.last_chat_request, current_request)
+
         # send request to llm interface
-        self.system.call_llm(supply_name, "InterfaceChatRequest", model=model, temperature=temperature, examples=examples, prompts=prompts, callback=callback)
+        self.system.call_llm(supply_name, "InterfaceChatRequest", model=model, temperature=temperature,
+                             examples=examples, prompts=prompts, new_chat=new_chat, callback=callback)
+
+        self.last_chat_request = current_request
 
     def onGenerateResult(self, result):
         # show result in plainTextEditResult
@@ -524,8 +535,12 @@ class GeneratorWithExampleDialog(QDialog):
             self.result_update_mutex.release()
             return
 
-        # to avoid the race condition, we use a timer to update the result
         self.result_update_mutex.acquire()
+        if reason == llm_interface.LLMInterface.ReasonCode.NEW_REPLY:
+            self.result_content = []
+            self.ui.plainTextEditResult.clear()
+
+        # to avoid the race condition, we use a timer to update the result
         self.result_content.append(result)
         self.result_update_mutex.release()
 
@@ -599,3 +614,44 @@ class GeneratorWithExampleDialog(QDialog):
         # get example tab
         example_tab = self.example_tabs[-1]
         example_tab.loadExampleFileDirectly(file_path)
+
+    def isNewChat(self, last_chat_request, current_chat_request):
+
+        # if the last chat request is empty, then it is not continouse chat
+        if not last_chat_request:
+            return True
+
+        # if the current chat request is empty, then it is not continouse chat
+        if not current_chat_request:
+            return True
+
+        # if the last chat request and current chat request are not the same, then it is not continouse chat
+        if len(last_chat_request["examples"]) != len(current_chat_request["examples"]):
+            return True
+
+        # compare the last chat request and current chat request
+        for index in range(len(last_chat_request["examples"])):
+            example = last_chat_request["examples"][index]
+            example2 = current_chat_request["examples"][index]
+
+            if example['desc'] != example2['desc']:
+                return True
+            if example['content'] != example2['content']:
+                return True
+            if example['response'] != example2['response']:
+                return True
+
+        if len(last_chat_request["prompts"]) + 1 != len(current_chat_request["prompts"]):
+            return True
+
+        for index in range(len(last_chat_request["prompts"])):
+            prompt = last_chat_request["prompts"][index]
+            prompt2 = current_chat_request["prompts"][index]
+
+            if prompt['system'] != prompt2['system']:
+                return True
+            if prompt['content'] != prompt2['content']:
+                return True
+
+        # if the last chat request and current chat request are the same, then it is continouse chat
+        return False

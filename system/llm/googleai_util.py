@@ -20,9 +20,8 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         self.generate_text_models= []
         self.generate_message_models = []
         self.model_name_list = []
-        self.request_names_thread = None
         self.chat_request_thread = None
-        self.mutex = threading.Lock()
+        self.reply = None
         self._get_valid_models()
     
     def update_palm_api_key(self):
@@ -31,7 +30,7 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         palm.configure(api_key=self.palm_api_key)
 
     def InterfaceIsValid(self):
-        return self.palm_api_key
+        return self.palm_api_key and self.model_list
     
     def InterfaceGetSupplyName(self):
         return "Google"
@@ -43,29 +42,18 @@ class GoogleAIUtil(llm_interface.LLMInterface):
 
         self.model_init = True
 
-        # get the valid models from openai
-        # because the access of internet is slow, so we use a thread to get the models
-        # and we use a signal to notify the main thread that the models are ready
-        # we use a list to store the models, because the thread can't return value
-        def get_models(self):
-            try:
-                # there maybe some errors when we fetching the model
-                # for example, the api cannot be accessed outside the US
-                model_list = palm.list_models()
-            except Exception as e:
-                return
-            self.mutex.acquire()
-            self.model_list = model_list
-            # save the models name to self.model_name_list
-            self.generate_text_models= [model.name for model in self.model_list if 'generateText' in model.supported_generation_methods]
-            self.embedding_models = [model.name for model in self.model_list if 'embedText' in model.supported_generation_methods]
-            self.generate_message_models = [model.name for model in self.model_list if 'generateMessage' in model.supported_generation_methods]
-            self.model_name_list = [model.name for model in self.model_list]
-            self.mutex.release()
-        
-        # start a thread to get the models
-        self.request_names_thread = threading.Thread(target=get_models, args=(self,))
-        self.request_names_thread.start()
+        try:
+            # there maybe some errors when we fetching the model
+            # for example, the api cannot be accessed outside the US
+            model_list = palm.list_models()
+        except Exception as e:
+            return
+        self.model_list = model_list
+        # save the models name to self.model_name_list
+        self.generate_text_models= [model.name for model in self.model_list if 'generateText' in model.supported_generation_methods]
+        self.embedding_models = [model.name for model in self.model_list if 'embedText' in model.supported_generation_methods]
+        self.generate_message_models = [model.name for model in self.model_list if 'generateMessage' in model.supported_generation_methods]
+        self.model_name_list = [model.name for model in self.model_list]
 
     def InterfaceGetAllModelNames(self):
         # get the models name
@@ -73,26 +61,21 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         if not self.model_list:
             self._get_valid_models()
         # return the models name, because model_list is a race resource, we need to lock it
-        self.mutex.acquire()
         name_list = self.model_name_list
-        self.mutex.release()
         return name_list
 
     def clear_models(self):
         # clear the models
-        self.mutex.acquire()
         self.model_list = []
         self.embedding_models= []
         self.generate_text_models= []
         self.generate_message_models = []
         self.model_name_list = []
-        self.mutex.release()
 
         self.model_init = False
 
     # when delete the object, we need to stop all the threads
     def __del__(self):
-        self.request_names_thread = None
         self.chat_request_thread = None
 
     def InterfaceGetEstimateCost(self, **kwargs):
@@ -114,6 +97,7 @@ class GoogleAIUtil(llm_interface.LLMInterface):
         prompts = kwargs.get('prompts', '')
         examples = kwargs.get('examples', [])
         callback = kwargs.get('callback', None)
+        new_chat = kwargs.get('new_chat', True)
 
         # if chat is running, wait for it
         if self.chat_request_thread and self.chat_request_thread.is_alive():
@@ -126,30 +110,46 @@ class GoogleAIUtil(llm_interface.LLMInterface):
                 callback("No prompts, Generate exit.", self.ReasonCode.FAILED)
             return None
 
+        # if starts new conversation, clear the reply, and find the last prompt
         context = self._getContext(prompts)
         model = palm.get_model(model_name)
 
+        if new_chat:
+            self.reply = None
+        else:
+            examples = []
+            prompt = prompts[-1]
+            prompts = [prompt]
+
         def get_response(self, model, context, temperature, examples, prompts, callback):
             index = 1
+
             for example in examples:
                 order = self.make_ordinal(index)
 
                 if example['desc']:
-                    message = '''This is {} example, the description is: {}, the example is: {}'''.format(order, example['desc'], example["content"])
+                    message = '''This is {} example, the description is: {}, the example is: """{}""", please read it.'''.format(order, example['desc'], example["content"])
                 else:
                     message = '''This is {} example, please read it: '''.format(order) + example["content"]
                 index += 1
 
-                reply = palm.chat(context=context, messages=message)
-                callback(reply.last, self.ReasonCode.NEW_REPLY) # type: ignore
+                if self.reply:
+                    self.reply.reply(message)
+                else:
+                    self.reply = palm.chat(context=context, messages=message, temperature=temperature)
+                callback(self.reply.last, self.ReasonCode.NEW_REPLY) # type: ignore
             
             for prompt in prompts:
                 message = prompt["content"] # type: ignore
-                reply = palm.chat(messages=message)
-                if reply.last is None:
+                if self.reply:
+                    self.reply = self.reply.reply(message)
+                else:
+                    self.reply = palm.chat(context=context, messages=message, temperature=temperature)
+
+                if self.reply.last is None:
                     callback("Sorry, I can't understand you. The reply is None.", self.ReasonCode.FAILED)
                 else:
-                    callback(reply.last, self.ReasonCode.NEW_REPLY) # type: ignore
+                    callback(self.reply.last, self.ReasonCode.NEW_REPLY) # type: ignore
 
             callback("") # type: ignore
 
@@ -161,4 +161,4 @@ class GoogleAIUtil(llm_interface.LLMInterface):
             if prompt["system"]:
                 context = prompt["system"]
                 return context
-        return "You are a professional programmer in our game develop team."
+        return "You are a expert at programming."
