@@ -108,6 +108,41 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.label_5 = QLabel(Dialog)
+        self.label_5.setObjectName(u"label_5")
+
+        self.horizontalLayout_6.addWidget(self.label_5)
+
+        self.lineEditSlackAuthToken = QLineEdit(Dialog)
+        self.lineEditSlackAuthToken.setObjectName(u"lineEditSlackAuthToken")
+
+        self.horizontalLayout_6.addWidget(self.lineEditSlackAuthToken)
+
+        self.label_6 = QLabel(Dialog)
+        self.label_6.setObjectName(u"label_6")
+
+        self.horizontalLayout_6.addWidget(self.label_6)
+
+        self.lineEditClaudeUserID = QLineEdit(Dialog)
+        self.lineEditClaudeUserID.setObjectName(u"lineEditClaudeUserID")
+
+        self.horizontalLayout_6.addWidget(self.lineEditClaudeUserID)
+
+        self.label_7 = QLabel(Dialog)
+        self.label_7.setObjectName(u"label_7")
+
+        self.horizontalLayout_6.addWidget(self.label_7)
+
+        self.lineEditSlackChannelID = QLineEdit(Dialog)
+        self.lineEditSlackChannelID.setObjectName(u"lineEditSlackChannelID")
+
+        self.horizontalLayout_6.addWidget(self.lineEditSlackChannelID)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
+
         self.buttonBox = QDialogButtonBox(Dialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setOrientation(Qt.Horizontal)
@@ -137,5 +172,8 @@ class Ui_Dialog(object):
         self.pushButtonApplyOpenAIKey.setText(QCoreApplication.translate("Dialog", u"Apply OpenAI api-key", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"Google PaLM api-key: ", None))
         self.pushButtonApplyGooglePalmKey.setText(QCoreApplication.translate("Dialog", u"Apply Google PaLM api-key", None))
+        self.label_5.setText(QCoreApplication.translate("Dialog", u"SlackApp Token", None))
+        self.label_6.setText(QCoreApplication.translate("Dialog", u"Claude user ID: ", None))
+        self.label_7.setText(QCoreApplication.translate("Dialog", u"General Channel ID: ", None))
     # retranslateUi
 

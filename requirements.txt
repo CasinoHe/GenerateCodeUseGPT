@@ -5,3 +5,4 @@ PySide6_Addons
 PySide6_Essentials
 tiktoken
 google-generativeai
+slack_sdk

@@ -23,6 +23,9 @@ class Settings(object):
         self.google_palm_key = ""
         self.project_root_dir = ""
         self.result_json_dir = ""
+        self.slack_token = ""
+        self.claude_user_id = ""
+        self.general_channel_id = ""
 
         self.init_conf_file()
 
@@ -64,11 +67,23 @@ class Settings(object):
         if 'result_json_dir' in conf_json:
             self.result_json_dir = conf_json['result_json_dir']
 
+        if 'slack_token' in conf_json:
+            self.slack_token = conf_json['slack_token']
+
+        if 'claude_user_id' in conf_json:
+            self.claude_user_id = conf_json['claude_user_id']
+
+        if 'general_channel_id' in conf_json:
+            self.general_channel_id = conf_json['general_channel_id']
+
     def pack_conf(self, conf_json):
         conf_json['openai_api_key'] = self.open_ai_key
         conf_json['google_palm_key'] = self.google_palm_key
         conf_json['project_root_dir'] = self.project_root_dir
         conf_json['result_json_dir'] = self.result_json_dir
+        conf_json['slack_token'] = self.slack_token
+        conf_json['claude_user_id'] = self.claude_user_id
+        conf_json['general_channel_id'] = self.general_channel_id
 
     def save_conf(self):
         '''
@@ -80,8 +95,14 @@ class Settings(object):
             json.dump(conf_json, f)
 
     def is_empty(self):
-        if self.open_ai_key == "" and self.google_palm_key == "":
-            return True
+        if self.open_ai_key:
+            return False
+
+        if self.google_palm_key:
+            return False
+
+        if self.slack_token and self.claude_user_id:
+            return False
 
         return False
 
@@ -165,3 +186,48 @@ class Settings(object):
         get the result json dir
         '''
         return self.result_json_dir
+
+    def InterfaceSetSlackToken(self, token):
+        '''
+        Interface, called outside
+        set the slack token
+        '''
+        self.slack_token = token
+        self.save_conf()
+
+    def InterfaceSetClaudeUserID(self, id):
+        '''
+        Interface, called outside
+        set the claude user id
+        '''
+        self.claude_user_id = id
+        self.save_conf()
+
+    def InterfaceSetGeneralChannelID(self, id):
+        '''
+        Interface, called outside
+        set the general channel id
+        '''
+        self.general_channel_id = id
+        self.save_conf()
+
+    def InterfaceGetSlackToken(self):
+        '''
+        Interface, called outside
+        get the slack token
+        '''
+        return self.slack_token
+
+    def InterfaceGetClaudeUserID(self):
+        '''
+        Interface, called outside
+        get the claude user id
+        '''
+        return self.claude_user_id
+
+    def InterfaceGetGeneralChannelID(self):
+        '''
+        Interface, called outside
+        get the general channel id
+        '''
+        return self.general_channel_id

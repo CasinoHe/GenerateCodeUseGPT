@@ -2,6 +2,7 @@
 from system.settings import settings
 from system.llm import openai_util 
 from system.llm import googleai_util
+from system.llm import slackapp_util
 from system.prompt import database
 
 def call_system_decorator(system_name):
@@ -67,12 +68,17 @@ class MainManager(object):
         self.database = database.ResultDatabase()
         self.openai_util = openai_util.OpenAIUtil(self.settings.InterfaceGetOpenAIKey())
         self.googleai_util = googleai_util.GoogleAIUtil(self.settings.InterfaceGetGooglePalmKey())
+        self.slackapp_util = slackapp_util.SlackAppUtil(self.settings.InterfaceGetSlackToken(), 
+                                                        self.settings.InterfaceGetClaudeUserID(), 
+                                                        self.settings.InterfaceGetGeneralChannelID())
 
         # insert the valid llm interface
         if self.openai_util.InterfaceIsValid():
             self.api_supply_dict[self.openai_util.InterfaceGetSupplyName()] = self.call_openai_util
         if self.googleai_util.InterfaceIsValid():
             self.api_supply_dict[self.googleai_util.InterfaceGetSupplyName()] = self.call_googleai_util
+        if self.slackapp_util.InterfaceIsValid():
+            self.api_supply_dict[self.slackapp_util.InterfaceGetSupplyName()] = self.call_slackapp_util
 
     def refresh_system(self):
         '''
@@ -96,6 +102,13 @@ class MainManager(object):
     @call_system_decorator("googleai_util")
     def call_googleai_util(self, *args, **kwargs):
         if self.googleai_util.InterfaceIsValid():
+            return True
+        else:
+            return False
+
+    @call_system_decorator("slackapp_util")
+    def call_slackapp_util(self, *args, **kwargs):
+        if self.slackapp_util.InterfaceIsValid():
             return True
         else:
             return False

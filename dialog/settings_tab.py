@@ -14,6 +14,16 @@ class SettingsTab(QDialog):
 
         # init system
         self.system = parent.system
+        self.openai_key = ""
+        self.google_palm_key = ""
+        self.project_root_dir = ""
+        self.result_json_dir = ""
+        self.slack_token = ""
+        self.claude_user_id = ""
+        self.general_channel_id = ""
+
+        # read config
+        self.read_settings()
 
         # init ui
         self.ui = ui.settings_ui.Ui_Dialog()
@@ -30,26 +40,31 @@ class SettingsTab(QDialog):
         self.ui.pushButtonApplyGooglePalmKey.clicked.connect(self.clickApplyGooglePalmKey)
         self.ui.pushButtonOpenResultJsonDir.clicked.connect(self.clickOpenResultJsonDir)
 
-        openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
-        google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
-        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
-        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
+        self.ui.lineEditOpenAIKey.setText(self.openai_key)
+        self.ui.lineEditGooglePalmKey.setText(self.google_palm_key)
+        self.ui.lineEditRootDir.setText(self.project_root_dir)
+        self.ui.lineEditResultJsonDir.setText(self.result_json_dir)
+        self.ui.lineEditSlackAuthToken.setText(self.slack_token)
+        self.ui.lineEditClaudeUserID.setText(self.claude_user_id)
+        self.ui.lineEditSlackChannelID.setText(self.general_channel_id)
 
-        self.ui.lineEditOpenAIKey.setText(openai_key)
-        self.ui.lineEditGooglePalmKey.setText(google_palm_key)
-        self.ui.lineEditRootDir.setText(project_root_dir)
-        self.ui.lineEditResultJsonDir.setText(result_json_dir)
+    def read_settings(self):
+        self.openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
+        self.google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
+        self.project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
+        self.result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
+        self.slack_token = self.system.call_settings("InterfaceGetSlackToken")
+        self.claude_user_id = self.system.call_settings("InterfaceGetClaudeUserID")
+        self.general_channel_id = self.system.call_settings("InterfaceGetGeneralChannelID")
 
     def show(self) -> None:
-        openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
-        google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
-        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
-        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
-
-        self.ui.lineEditOpenAIKey.setText(openai_key)
-        self.ui.lineEditGooglePalmKey.setText(google_palm_key)
-        self.ui.lineEditRootDir.setText(project_root_dir)
-        self.ui.lineEditResultJsonDir.setText(result_json_dir)
+        self.ui.lineEditOpenAIKey.setText(self.openai_key)
+        self.ui.lineEditGooglePalmKey.setText(self.google_palm_key)
+        self.ui.lineEditRootDir.setText(self.project_root_dir)
+        self.ui.lineEditResultJsonDir.setText(self.result_json_dir)
+        self.ui.lineEditSlackAuthToken.setText(self.slack_token)
+        self.ui.lineEditClaudeUserID.setText(self.claude_user_id)
+        self.ui.lineEditSlackChannelID.setText(self.general_channel_id)
         return super().show()
 
     def clickOpenResultJsonDir(self):
@@ -91,7 +106,7 @@ class SettingsTab(QDialog):
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
             if reply == QMessageBox.StandardButton.Yes:
                 # save the settings
-                self.saveSettings()
+                self.save_settings()
                 if self.system.call_settings("InterfaceIsEmpty"):
                     QMessageBox.warning(self, "Warning", "Please set at least one api settings first")
                     return None
@@ -126,31 +141,46 @@ class SettingsTab(QDialog):
             else:
                 return super().reject()
 
-    def saveSettings(self):
-        openai_key = self.ui.lineEditOpenAIKey.text()
-        google_palm_key = self.ui.lineEditGooglePalmKey.text()
-        project_root_dir = self.ui.lineEditRootDir.text()
-        result_json_dir = self.ui.lineEditResultJsonDir.text()
+    def save_settings(self):
+        self.openai_key = self.ui.lineEditOpenAIKey.text()
+        self.google_palm_key = self.ui.lineEditGooglePalmKey.text()
+        self.project_root_dir = self.ui.lineEditRootDir.text()
+        self.result_json_dir = self.ui.lineEditResultJsonDir.text()
+        self.slack_token = self.ui.lineEditSlackAuthToken.text()
+        self.claude_user_id = self.ui.lineEditClaudeUserID.text()
+        self.general_channel_id = self.ui.lineEditSlackChannelID.text()
 
-        self.system.call_settings("InterfaceSetOpenAIKey", openai_key)
-        self.system.call_settings("InterfaceSetGooglePalmKey", google_palm_key)
-        self.system.call_settings("InterfaceSetProjectRootDir", project_root_dir)
-        self.system.call_settings("InterfaceSetResultJsonDir", result_json_dir)
+        self.system.call_settings("InterfaceSetOpenAIKey", self.openai_key)
+        self.system.call_settings("InterfaceSetGooglePalmKey", self.google_palm_key)
+        self.system.call_settings("InterfaceSetProjectRootDir", self.project_root_dir)
+        self.system.call_settings("InterfaceSetResultJsonDir", self.result_json_dir)
+        self.system.call_settings("InterfaceSetSlackToken", self.slack_token)
+        self.system.call_settings("InterfaceSetClaudeUserID", self.claude_user_id)
+        self.system.call_settings("InterfaceSetGeneralChannelID", self.general_channel_id)
         self.system.call_settings("InterfaceSaveConf")
 
     def textChanged(self):
-        openai_key = self.system.call_settings("InterfaceGetOpenAIKey")
-        google_palm_key = self.system.call_settings("InterfaceGetGooglePalmKey")
-        project_root_dir = self.system.call_settings("InterfaceGetProjectRootDir")
-        result_json_dir = self.system.call_settings("InterfaceGetResultJsonDir")
-
         openai_key_text = self.ui.lineEditOpenAIKey.text()  
         google_palm_key_text = self.ui.lineEditGooglePalmKey.text()
         project_root_dir_text = self.ui.lineEditRootDir.text()
         result_json_dir_text = self.ui.lineEditResultJsonDir.text()
+        slack_token = self.ui.lineEditSlackAuthToken.text()
+        claude_user_id = self.ui.lineEditClaudeUserID.text()
+        general_channel_id = self.ui.lineEditSlackChannelID.text()
 
-        if openai_key_text != openai_key or google_palm_key_text != google_palm_key \
-                or project_root_dir_text != project_root_dir or result_json_dir_text != result_json_dir:
+        if openai_key_text != self.openai_key:
+            return True
+        if google_palm_key_text != self.google_palm_key:
+            return True
+        if project_root_dir_text != self.project_root_dir:
+            return True
+        if result_json_dir_text != self.result_json_dir:
+            return True
+        if slack_token != self.slack_token:
+            return True
+        if claude_user_id != self.claude_user_id:
+            return True
+        if general_channel_id != self.general_channel_id:
             return True
         else:
             return False
