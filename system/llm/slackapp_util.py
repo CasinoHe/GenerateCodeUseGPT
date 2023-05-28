@@ -7,11 +7,17 @@ import time
 
 
 class SlackAppUtil(llm_interface.LLMInterface):
+    class LastMessageStatus(object):
+        TYPING = 0
+        WAITING = 1
+        COMPLETED = 2
+
     def __init__(self, token, claude_id, channel_id):
         super().__init__()
 
         self.channel_id = channel_id
         self.claude_id = claude_id
+
         self.last_timestamp = time.time()
         self.at_clause_message = " <@{}>".format(self.claude_id)
 
@@ -47,11 +53,12 @@ class SlackAppUtil(llm_interface.LLMInterface):
             return response["messages"]  # type: ignore
 
     def get_last_message(self, thread_ts, channel_id=None):
+        status = SlackAppUtil.LastMessageStatus.WAITING
         if not channel_id:
             channel_id = self.channel_id
         messages = self.retreving_thread_replies(thread_ts, channel_id)
         if not messages:
-            return None
+            return None, status
 
         # find the message that sent previously
         found = False
@@ -61,20 +68,21 @@ class SlackAppUtil(llm_interface.LLMInterface):
         for message in messages:
             # find the first message that claude sent
             if message["user"] == self.claude_id:
-                if message["text"].endswith("Typing…") or message["text"].endswith("Typing…_"):
-                    continue
-                else:
-                    last_message = message["text"]
+                last_message = message["text"]
 
+                if last_message.endswith("Typing…") or last_message.endswith("Typing…_"):
+                    status = SlackAppUtil.LastMessageStatus.TYPING
+                else:
+                    status = SlackAppUtil.LastMessageStatus.COMPLETED
             # we need find the first message as the same as the message previousely sent
-            if message["text"] == self.reply["message"]["text"]: # type: ignore
+            elif message["text"] == self.reply["message"]["text"]: # type: ignore
                 found = True
                 break
 
         if found:
-            return last_message
+            return last_message, status
         else:
-            return None
+            return None, status
 
     def post_message(self, message, threads_ts=None, channel_id=None):
         if not channel_id:
@@ -91,28 +99,34 @@ class SlackAppUtil(llm_interface.LLMInterface):
             if self.conversation_ts is None:
                 self.conversation_ts = self.reply["ts"]
 
-            # if no reply, send it again
-            if self.reply and self.reply['ts']:
-                break
-            else:
+            if not self.reply or not self.reply['ts']:
+                # if no reply, send it again
                 time.sleep(interval)
                 timeout -= interval
                 if timeout <= 0:
-                    return "Request slack api Timeout!"
+                    return False
+            else:
+                # if reply, return
+                return True
 
+    def get_claude_reply(self, interval=2):
         # wait and get reply
-        time.sleep(1)
         timeout = 300
         while True:
-            last_message = self.get_last_message(self.conversation_ts)
-            if not last_message:
+            last_message, status = self.get_last_message(self.conversation_ts)
+            if status == SlackAppUtil.LastMessageStatus.TYPING:
                 time.sleep(interval)
                 timeout -= interval
                 if timeout <= 0:
                     return "get claude reply timeout!"
+                yield last_message 
+            elif status == SlackAppUtil.LastMessageStatus.WAITING:
                 continue
+            elif status == SlackAppUtil.LastMessageStatus.COMPLETED:
+                yield last_message
+                break
             else:
-                return last_message
+                return "API Error. Get Claude reply failed!"
 
     def start_conversation(self, message, channel_id=None):
         if not self.reply:
@@ -157,14 +171,25 @@ class SlackAppUtil(llm_interface.LLMInterface):
             prompt = prompts[-1]
             prompts = [prompt]
 
+        def handle_reply(reply, call_func, error_message):
+            if reply:
+                # send message succeed, then get reply
+                for message in self.get_claude_reply():
+                    print("get reply: ", message)
+                    call_func(message, self.ReasonCode.NEW_REPLY)
+                return True
+            else:
+                call_func(error_message, self.ReasonCode.SUCCESS)
+                return False
+
         def get_response(self, context, examples, prompts, callback):
             index = 1
 
             # if the message is not sent, send it again
             if new_chat:
                 reply = self.start_conversation(context)
-                if callback:
-                    callback(reply, self.ReasonCode.NEW_REPLY)
+                if not handle_reply(reply, callback, "Slack app error, Cannot send message to slack."):
+                    return
             
             for example in examples:
                 order = self.make_ordinal(index)
@@ -176,18 +201,14 @@ class SlackAppUtil(llm_interface.LLMInterface):
                 index += 1
 
                 reply = self.start_conversation(message)
-                if reply:
-                    callback(reply, self.ReasonCode.NEW_REPLY) # type: ignore
-                else:
-                    callback("Sorry, I can't understand you. The reply is None.", self.ReasonCode.FAILED)
+                if not handle_reply(reply, callback, "Sorry, I can't understand you. The reply is None."):
+                    return
             
             for prompt in prompts:
                 message = prompt["content"] # type: ignore
                 reply = self.start_conversation(message)
-                if reply:
-                    callback(reply, self.ReasonCode.NEW_REPLY) # type: ignore
-                else:
-                    callback("Sorry, I can't understand you. The reply is None.", self.ReasonCode.FAILED)
+                if not handle_reply(reply, callback, "Sorry, I can't understand you. The reply is None."):
+                    return
 
             callback("") # type: ignore
 
@@ -199,7 +220,7 @@ class SlackAppUtil(llm_interface.LLMInterface):
             if prompt["system"]:
                 context = prompt["system"]
                 return context
-        return "I want you to be a expert at python programming."
+        return "Suppose you are a programming asistant, please help me at programming."
 
     def InterfaceEmbeddingRequest(self, **kwargs):
         raise NotImplementedError
