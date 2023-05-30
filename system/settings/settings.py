@@ -104,7 +104,7 @@ class Settings(object):
         if self.slack_token and self.claude_user_id and self.general_channel_id:
             return False
 
-        return False
+        return True
 
     def InterfaceIsEmpty(self):
         '''
