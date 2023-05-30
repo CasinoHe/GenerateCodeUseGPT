@@ -17,14 +17,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QDoubleSpinBox,
     QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy,
-    QSpacerItem, QTabWidget, QVBoxLayout, QWidget)
+    QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
+    QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(1278, 888)
+        Dialog.resize(1325, 909)
         self.horizontalLayout = QHBoxLayout(Dialog)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.scrollArea = QScrollArea(Dialog)
@@ -32,7 +32,7 @@ class Ui_Dialog(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1258, 868))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1305, 889))
         self.horizontalLayout_17 = QHBoxLayout(self.scrollAreaWidgetContents)
         self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
         self.verticalLayout = QVBoxLayout()
@@ -155,159 +155,109 @@ class Ui_Dialog(object):
         self.groupBoxOutPut.setObjectName(u"groupBoxOutPut")
         self.horizontalLayout_12 = QHBoxLayout(self.groupBoxOutPut)
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.horizontalLayout_11 = QHBoxLayout()
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.verticalLayout_8 = QVBoxLayout()
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
-        self.plainTextEditResult = QPlainTextEdit(self.groupBoxOutPut)
-        self.plainTextEditResult.setObjectName(u"plainTextEditResult")
-
-        self.verticalLayout_8.addWidget(self.plainTextEditResult)
-
-        self.horizontalLayout_21 = QHBoxLayout()
-        self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
-        self.labelUsedToken = QLabel(self.groupBoxOutPut)
-        self.labelUsedToken.setObjectName(u"labelUsedToken")
-
-        self.horizontalLayout_21.addWidget(self.labelUsedToken)
-
-        self.lineEditTokenAmount = QLineEdit(self.groupBoxOutPut)
-        self.lineEditTokenAmount.setObjectName(u"lineEditTokenAmount")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEditTokenAmount.sizePolicy().hasHeightForWidth())
-        self.lineEditTokenAmount.setSizePolicy(sizePolicy)
-        self.lineEditTokenAmount.setReadOnly(True)
-
-        self.horizontalLayout_21.addWidget(self.lineEditTokenAmount)
-
-        self.labelEstimateCost = QLabel(self.groupBoxOutPut)
-        self.labelEstimateCost.setObjectName(u"labelEstimateCost")
-
-        self.horizontalLayout_21.addWidget(self.labelEstimateCost)
-
-        self.lineEditEstimateCost = QLineEdit(self.groupBoxOutPut)
-        self.lineEditEstimateCost.setObjectName(u"lineEditEstimateCost")
-        self.lineEditEstimateCost.setReadOnly(True)
-
-        self.horizontalLayout_21.addWidget(self.lineEditEstimateCost)
-
-        self.labelRealCost = QLabel(self.groupBoxOutPut)
-        self.labelRealCost.setObjectName(u"labelRealCost")
-
-        self.horizontalLayout_21.addWidget(self.labelRealCost)
-
-        self.lineEdit = QLineEdit(self.groupBoxOutPut)
-        self.lineEdit.setObjectName(u"lineEdit")
-
-        self.horizontalLayout_21.addWidget(self.lineEdit)
-
-        self.label_3 = QLabel(self.groupBoxOutPut)
-        self.label_3.setObjectName(u"label_3")
-
-        self.horizontalLayout_21.addWidget(self.label_3)
-
-        self.lineEditTotalCost = QLineEdit(self.groupBoxOutPut)
-        self.lineEditTotalCost.setObjectName(u"lineEditTotalCost")
-
-        self.horizontalLayout_21.addWidget(self.lineEditTotalCost)
-
-        self.label_2 = QLabel(self.groupBoxOutPut)
-        self.label_2.setObjectName(u"label_2")
-
-        self.horizontalLayout_21.addWidget(self.label_2)
-
-        self.lineEditHistoricalCost = QLineEdit(self.groupBoxOutPut)
-        self.lineEditHistoricalCost.setObjectName(u"lineEditHistoricalCost")
-
-        self.horizontalLayout_21.addWidget(self.lineEditHistoricalCost)
-
-
-        self.verticalLayout_8.addLayout(self.horizontalLayout_21)
-
-
-        self.horizontalLayout_11.addLayout(self.verticalLayout_8)
-
-        self.horizontalLayout_13 = QHBoxLayout()
-        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
-        self.groupBoxResult = QGroupBox(self.groupBoxOutPut)
-        self.groupBoxResult.setObjectName(u"groupBoxResult")
-        self.horizontalLayout_14 = QHBoxLayout(self.groupBoxResult)
-        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.verticalLayout_5 = QVBoxLayout()
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.comboBoxSupplyName = QComboBox(self.groupBoxResult)
+        self.label_4 = QLabel(self.groupBoxOutPut)
+        self.label_4.setObjectName(u"label_4")
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
+        self.label_4.setSizePolicy(sizePolicy)
+
+        self.horizontalLayout_4.addWidget(self.label_4)
+
+        self.comboBoxSupplyName = QComboBox(self.groupBoxOutPut)
         self.comboBoxSupplyName.setObjectName(u"comboBoxSupplyName")
+        sizePolicy.setHeightForWidth(self.comboBoxSupplyName.sizePolicy().hasHeightForWidth())
+        self.comboBoxSupplyName.setSizePolicy(sizePolicy)
+        self.comboBoxSupplyName.setMinimumSize(QSize(80, 0))
 
         self.horizontalLayout_4.addWidget(self.comboBoxSupplyName)
 
-        self.comboBoxModel = QComboBox(self.groupBoxResult)
+        self.comboBoxModel = QComboBox(self.groupBoxOutPut)
         self.comboBoxModel.setObjectName(u"comboBoxModel")
-        self.comboBoxModel.setMinimumSize(QSize(90, 0))
+        sizePolicy.setHeightForWidth(self.comboBoxModel.sizePolicy().hasHeightForWidth())
+        self.comboBoxModel.setSizePolicy(sizePolicy)
+        self.comboBoxModel.setMinimumSize(QSize(120, 0))
         self.comboBoxModel.setToolTipDuration(1)
         self.comboBoxModel.setInputMethodHints(Qt.ImhNone)
 
         self.horizontalLayout_4.addWidget(self.comboBoxModel)
 
-
-        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
-
-        self.horizontalLayout_5 = QHBoxLayout()
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.label = QLabel(self.groupBoxResult)
+        self.label = QLabel(self.groupBoxOutPut)
         self.label.setObjectName(u"label")
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
 
-        self.horizontalLayout_5.addWidget(self.label)
+        self.horizontalLayout_4.addWidget(self.label)
 
-        self.doubleSpinBoxTemperature = QDoubleSpinBox(self.groupBoxResult)
+        self.doubleSpinBoxTemperature = QDoubleSpinBox(self.groupBoxOutPut)
         self.doubleSpinBoxTemperature.setObjectName(u"doubleSpinBoxTemperature")
         self.doubleSpinBoxTemperature.setMaximum(1.000000000000000)
         self.doubleSpinBoxTemperature.setSingleStep(0.050000000000000)
 
-        self.horizontalLayout_5.addWidget(self.doubleSpinBoxTemperature)
+        self.horizontalLayout_4.addWidget(self.doubleSpinBoxTemperature)
 
+        self.labelUsedToken = QLabel(self.groupBoxOutPut)
+        self.labelUsedToken.setObjectName(u"labelUsedToken")
 
-        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout_4.addWidget(self.labelUsedToken)
 
-        self.pushButtonGenerateResult = QPushButton(self.groupBoxResult)
+        self.lineEditTokenAmount = QLineEdit(self.groupBoxOutPut)
+        self.lineEditTokenAmount.setObjectName(u"lineEditTokenAmount")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.lineEditTokenAmount.sizePolicy().hasHeightForWidth())
+        self.lineEditTokenAmount.setSizePolicy(sizePolicy1)
+        self.lineEditTokenAmount.setReadOnly(True)
+
+        self.horizontalLayout_4.addWidget(self.lineEditTokenAmount)
+
+        self.labelEstimateCost = QLabel(self.groupBoxOutPut)
+        self.labelEstimateCost.setObjectName(u"labelEstimateCost")
+
+        self.horizontalLayout_4.addWidget(self.labelEstimateCost)
+
+        self.lineEditEstimateCost = QLineEdit(self.groupBoxOutPut)
+        self.lineEditEstimateCost.setObjectName(u"lineEditEstimateCost")
+        self.lineEditEstimateCost.setReadOnly(True)
+
+        self.horizontalLayout_4.addWidget(self.lineEditEstimateCost)
+
+        self.labelTotalCost = QLabel(self.groupBoxOutPut)
+        self.labelTotalCost.setObjectName(u"labelTotalCost")
+
+        self.horizontalLayout_4.addWidget(self.labelTotalCost)
+
+        self.lineEditTotalCost = QLineEdit(self.groupBoxOutPut)
+        self.lineEditTotalCost.setObjectName(u"lineEditTotalCost")
+
+        self.horizontalLayout_4.addWidget(self.lineEditTotalCost)
+
+        self.pushButtonGenerateResult = QPushButton(self.groupBoxOutPut)
         self.pushButtonGenerateResult.setObjectName(u"pushButtonGenerateResult")
 
-        self.verticalLayout_5.addWidget(self.pushButtonGenerateResult)
+        self.horizontalLayout_4.addWidget(self.pushButtonGenerateResult)
 
-        self.pushButtonLoadQueryInfo = QPushButton(self.groupBoxResult)
-        self.pushButtonLoadQueryInfo.setObjectName(u"pushButtonLoadQueryInfo")
-
-        self.verticalLayout_5.addWidget(self.pushButtonLoadQueryInfo)
-
-        self.pushButtonSaveQueryInfo = QPushButton(self.groupBoxResult)
+        self.pushButtonSaveQueryInfo = QPushButton(self.groupBoxOutPut)
         self.pushButtonSaveQueryInfo.setObjectName(u"pushButtonSaveQueryInfo")
 
-        self.verticalLayout_5.addWidget(self.pushButtonSaveQueryInfo)
+        self.horizontalLayout_4.addWidget(self.pushButtonSaveQueryInfo)
 
-        self.pushButtonCopyResult = QPushButton(self.groupBoxResult)
-        self.pushButtonCopyResult.setObjectName(u"pushButtonCopyResult")
+        self.pushButtonLoadQueryInfo = QPushButton(self.groupBoxOutPut)
+        self.pushButtonLoadQueryInfo.setObjectName(u"pushButtonLoadQueryInfo")
 
-        self.verticalLayout_5.addWidget(self.pushButtonCopyResult)
-
-        self.pushButtonSendPrompt = QPushButton(self.groupBoxResult)
-        self.pushButtonSendPrompt.setObjectName(u"pushButtonSendPrompt")
-
-        self.verticalLayout_5.addWidget(self.pushButtonSendPrompt)
+        self.horizontalLayout_4.addWidget(self.pushButtonLoadQueryInfo)
 
 
-        self.horizontalLayout_14.addLayout(self.verticalLayout_5)
+        self.verticalLayout_8.addLayout(self.horizontalLayout_4)
 
 
-        self.horizontalLayout_13.addWidget(self.groupBoxResult)
-
-
-        self.horizontalLayout_11.addLayout(self.horizontalLayout_13)
-
-
-        self.horizontalLayout_12.addLayout(self.horizontalLayout_11)
+        self.horizontalLayout_12.addLayout(self.verticalLayout_8)
 
 
         self.verticalLayout.addWidget(self.groupBoxOutPut)
@@ -343,14 +293,8 @@ class Ui_Dialog(object):
         self.pushButtonClearPrompt.setText(QCoreApplication.translate("Dialog", u"Clear Current", None))
         self.pushButtonDeletePrompt.setText(QCoreApplication.translate("Dialog", u"Delete Prompt", None))
         self.pushButtonNewPrompt.setText(QCoreApplication.translate("Dialog", u"New Prompt", None))
-        self.groupBoxOutPut.setTitle(QCoreApplication.translate("Dialog", u"Result", None))
-        self.labelUsedToken.setText(QCoreApplication.translate("Dialog", u"Used token amount: ", None))
-        self.lineEditTokenAmount.setText("")
-        self.labelEstimateCost.setText(QCoreApplication.translate("Dialog", u"Estimate cost: ", None))
-        self.labelRealCost.setText(QCoreApplication.translate("Dialog", u"Real cost: ", None))
-        self.label_3.setText(QCoreApplication.translate("Dialog", u"Total cost: ", None))
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"Historical cost: ", None))
-        self.groupBoxResult.setTitle(QCoreApplication.translate("Dialog", u"Result operation", None))
+        self.groupBoxOutPut.setTitle(QCoreApplication.translate("Dialog", u"Generator", None))
+        self.label_4.setText(QCoreApplication.translate("Dialog", u"Model chosen: ", None))
 #if QT_CONFIG(tooltip)
         self.comboBoxModel.setToolTip("")
 #endif // QT_CONFIG(tooltip)
@@ -358,10 +302,12 @@ class Ui_Dialog(object):
         self.comboBoxModel.setWhatsThis("")
 #endif // QT_CONFIG(whatsthis)
         self.label.setText(QCoreApplication.translate("Dialog", u"Temperature: ", None))
+        self.labelUsedToken.setText(QCoreApplication.translate("Dialog", u"Used token: ", None))
+        self.lineEditTokenAmount.setText("")
+        self.labelEstimateCost.setText(QCoreApplication.translate("Dialog", u"Estimate cost: ", None))
+        self.labelTotalCost.setText(QCoreApplication.translate("Dialog", u"Total Cost: ", None))
         self.pushButtonGenerateResult.setText(QCoreApplication.translate("Dialog", u"Generate", None))
-        self.pushButtonLoadQueryInfo.setText(QCoreApplication.translate("Dialog", u"Load Data", None))
         self.pushButtonSaveQueryInfo.setText(QCoreApplication.translate("Dialog", u"Save Data", None))
-        self.pushButtonCopyResult.setText(QCoreApplication.translate("Dialog", u"Copy result", None))
-        self.pushButtonSendPrompt.setText(QCoreApplication.translate("Dialog", u"Send to Prompt", None))
+        self.pushButtonLoadQueryInfo.setText(QCoreApplication.translate("Dialog", u"Load Data", None))
     # retranslateUi
 

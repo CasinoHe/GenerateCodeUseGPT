@@ -90,10 +90,30 @@ class Ui_Form(object):
         self.groupBoxResponse.setObjectName(u"groupBoxResponse")
         self.horizontalLayout_3 = QHBoxLayout(self.groupBoxResponse)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.verticalLayout_3 = QVBoxLayout()
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.plainTextEditResponse = QPlainTextEdit(self.groupBoxResponse)
         self.plainTextEditResponse.setObjectName(u"plainTextEditResponse")
 
-        self.horizontalLayout_3.addWidget(self.plainTextEditResponse)
+        self.verticalLayout_3.addWidget(self.plainTextEditResponse)
+
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.pushButtonCopyResult = QPushButton(self.groupBoxResponse)
+        self.pushButtonCopyResult.setObjectName(u"pushButtonCopyResult")
+
+        self.horizontalLayout_6.addWidget(self.pushButtonCopyResult)
+
+        self.pushButtonSaveToFile = QPushButton(self.groupBoxResponse)
+        self.pushButtonSaveToFile.setObjectName(u"pushButtonSaveToFile")
+
+        self.horizontalLayout_6.addWidget(self.pushButtonSaveToFile)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_6)
+
+
+        self.horizontalLayout_3.addLayout(self.verticalLayout_3)
 
 
         self.horizontalLayout.addWidget(self.groupBoxResponse)
@@ -115,5 +135,7 @@ class Ui_Form(object):
         self.pushButtonPromptOpen.setText(QCoreApplication.translate("Form", u"Open", None))
         self.pushButtonPromptSave.setText(QCoreApplication.translate("Form", u"Save", None))
         self.groupBoxResponse.setTitle(QCoreApplication.translate("Form", u"Response", None))
+        self.pushButtonCopyResult.setText(QCoreApplication.translate("Form", u"Copy Result", None))
+        self.pushButtonSaveToFile.setText(QCoreApplication.translate("Form", u"Save to File", None))
     # retranslateUi
 

@@ -49,6 +49,7 @@ class ProductiveAIGCToolWindows(QMainWindow):
         self.initReviewMenu()
         self.initGeneratorMenu()
         self.initEmbeddingsMenu()
+        self.initCostMenu()
         self.initSettingsMenu()
 
     def initSettingsMenu(self):
@@ -62,6 +63,16 @@ class ProductiveAIGCToolWindows(QMainWindow):
         new_action = QAction("Generate with Example", self)
         new_menu.addAction(new_action)
         new_action.triggered.connect(self.clickOpenGenerateWithExamplePanel)
+
+    def initCostMenu(self):
+        new_menu = self.ui.menubar.addMenu("Cost")
+        new_action = QAction("Cost history", self)
+        new_menu.addAction(new_action)
+        new_action.triggered.connect(self.clickCostHistory)
+
+        new_action = QAction("Total cost statistics", self)
+        new_menu.addAction(new_action)
+        new_action.triggered.connect(self.clickCostStatistics)
 
     def initEmbeddingsMenu(self):
         new_menu = self.ui.menubar.addMenu("Embeddings")
@@ -229,3 +240,9 @@ class ProductiveAIGCToolWindows(QMainWindow):
             self.gen_code_panel.initModelComboBox()
         self.gen_code_panel.loadExampleFileDirectly(file_path)
         self.gen_code_panel.show()
+
+    def clickCostHistory(self):
+        pass
+
+    def clickCostStatistics(self):
+        pass

@@ -72,6 +72,14 @@ class SlackAppUtil(llm_interface.LLMInterface):
 
                 if last_message.endswith("Typing…") or last_message.endswith("Typing…_"):
                     status = SlackAppUtil.LastMessageStatus.TYPING
+                elif last_message.startswith("&gt; _*Please note:* Claude"):
+                    '''
+                    claude will send a notice like this, we need to skip it:
+
+                    &gt; _*Please note:* Claude is not skilled at solving math problems._
+                    &gt; _See the <https://console.anthropic.com/docs|Claude documentation> for more information._
+                    '''
+                    continue
                 else:
                     status = SlackAppUtil.LastMessageStatus.COMPLETED
             # we need find the first message as the same as the message previousely sent

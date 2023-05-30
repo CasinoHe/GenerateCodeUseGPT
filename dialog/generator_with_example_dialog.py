@@ -174,19 +174,12 @@ class GeneratorWithExampleDialog(QDialog):
         self.ui.pushButtonSaveQueryInfo.clicked.connect(self.clickSaveInfo)
         # connect load info button
         self.ui.pushButtonLoadQueryInfo.clicked.connect(self.clickLoadInfo)
-        # connect copy result button
-        self.ui.pushButtonCopyResult.clicked.connect(self.clickCopyResult)
-        # connect send result to propt response edit button
-        self.ui.pushButtonSendPrompt.clicked.connect(self.clickSendPrompt)
         # connect supply name combo box change
         self.ui.comboBoxSupplyName.currentIndexChanged.connect(self.changeSupplyName)
         # connect supply name combo box when user click it
         self.ui.comboBoxSupplyName.activated.connect(self.clickSupplyName)
         # connect model name combo box when user click it
         self.ui.comboBoxModel.activated.connect(self.clickModelComboBox)
-
-        # we cannot modify the result, so we disable the result plain text edit
-        self.ui.plainTextEditResult.setReadOnly(True)
 
         self.initModelComboBox()
 
@@ -281,16 +274,6 @@ class GeneratorWithExampleDialog(QDialog):
             hint_text = model.item(i).text() # type: ignore
             model.setData(model.index(i, 0), hint_text, Qt.ToolTipRole) # type: ignore
 
-    def clickCopyResult(self):
-        # copy the text in plainTextEditResult to clipboard
-        text = self.ui.plainTextEditResult.toPlainText()
-        if text:
-            # call system clipboard
-            clipboard = QApplication.clipboard()
-            clipboard.setText(text)
-            # show a message box to user
-            QMessageBox.information(self, "Copy Result", "Copy result to clipboard successfully!")
-
     def clickSaveInfo(self):
         '''save all info to a json file, so we can use it to generate code again'''
         opendir = self.system.call_settings("InterfaceGetResultJsonDir")
@@ -306,7 +289,8 @@ class GeneratorWithExampleDialog(QDialog):
         self._packPromptInfo(prompt_info)
         generate_info = {}
         self._packGenerateInfo(generate_info)
-        result = self.ui.plainTextEditResult.toPlainText()
+        # result is deprecated
+        result = ""
 
         # save file
         save_result = self.system.call_database(
@@ -460,8 +444,10 @@ class GeneratorWithExampleDialog(QDialog):
     def _unpackResultInfo(self, result_info):
         if not result_info:
             return
-        # load result info from a json file
-        self.ui.plainTextEditResult.setPlainText(result_info)
+        # find the last prompt tab
+        last_prompt_tab = self.prompt_tabs[-1]
+        # set the prompt tab data
+        last_prompt_tab.setPromptResponse(result_info)
 
     def clickGenerateResult(self):
         # get parameters
@@ -524,8 +510,10 @@ class GeneratorWithExampleDialog(QDialog):
         self.last_chat_request = current_request
 
     def onGenerateResult(self, result):
-        # show result in plainTextEditResult
-        self.ui.plainTextEditResult.setPlainText(result)
+        # find the last prompt tab
+        last_prompt_tab = self.prompt_tabs[-1]
+        # show result in prompt tab's response
+        last_prompt_tab.setPromptResponse(result)
 
     def onGenerateResultAppend(self, result, reason):
         # if result is empty, we call onGenerateResultCompleted
@@ -538,7 +526,9 @@ class GeneratorWithExampleDialog(QDialog):
         self.result_update_mutex.acquire()
         if reason == llm_interface.LLMInterface.ReasonCode.NEW_REPLY:
             self.result_content = []
-            self.ui.plainTextEditResult.clear()
+            # find the last prompt tab
+            last_prompt_tab = self.prompt_tabs[-1]
+            last_prompt_tab.clearPromptResponse()
 
         # to avoid the race condition, we use a timer to update the result
         self.result_content.append(result)
@@ -547,22 +537,28 @@ class GeneratorWithExampleDialog(QDialog):
     def onGenerateResultCompleted(self):
         # enable generate button
         self.ui.pushButtonGenerateResult.setEnabled(True)
-        self.ui.pushButtonCopyResult.setEnabled(True)
+        self.ui.pushButtonDeletePrompt.setEnabled(True)
+        self.ui.pushButtonClearPrompt.setEnabled(True)
+        self.ui.pushButtonNewPrompt.setEnabled(True)
         self.result_update_timer.stop()
         self.result_update_timer.deleteLater()
         self.result_content = []
 
     def appendResult(self, result):
-        # append result in plainTextEditResult without newline
-        text_cursor = QtGui.QTextCursor(self.ui.plainTextEditResult.document())
-        text_cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
-        text_cursor.insertText(result)
+        # find the last prompt tab
+        last_prompt_tab = self.prompt_tabs[-1]
+        # show result in prompt tab's response
+        last_prompt_tab.appendPromptResponse(result)
 
     def initGenerateResult(self):
+        # find the last prompt tab
+        last_prompt_tab = self.prompt_tabs[-1]
+        last_prompt_tab.initGenerateResult()
         # disable generate button and clear result, copy result button
         self.ui.pushButtonGenerateResult.setEnabled(False)
-        self.ui.plainTextEditResult.clear()
-        self.ui.pushButtonCopyResult.setEnabled(False)
+        self.ui.pushButtonDeletePrompt.setEnabled(False)
+        self.ui.pushButtonClearPrompt.setEnabled(False)
+        self.ui.pushButtonNewPrompt.setEnabled(False)
         self.result_content = []
         self.result_completed = False
         self.result_update_mutex = threading.Lock()
@@ -587,28 +583,6 @@ class GeneratorWithExampleDialog(QDialog):
                 self.appendResult(content)
             self.onGenerateResultCompleted()
             self.result_update_mutex.release()
-
-    def clickSendPrompt(self):
-        # send the result context to prompt response edit
-        # find the last prompt tab
-        prompt_tab = self.prompt_tabs[-1]
-        # if the prompt content in last prompt tab is empty, then we don't need to send request
-        if prompt_tab.isPromptEmpty():
-            QMessageBox.warning(self, "Warning", "Prompt content is empty!")
-            return
-        # if the result content is empty, then we don't need to send request
-        if self.ui.plainTextEditResult.toPlainText() == "":
-            QMessageBox.warning(self, "Warning", "Result content is empty!")
-            return
-        prompt_tab.setPromptResponse(self.ui.plainTextEditResult.toPlainText())
-        # clear the result context
-        self.ui.plainTextEditResult.clear()
-        # new prompt and set current index
-        self.clickAddPromptTab()
-        # set focus to previous prompt content
-        self.ui.tabWidgetPrompt.setCurrentIndex(self.ui.tabWidgetPrompt.count() - 2)
-        prompt_tab = self.prompt_tabs[-2]
-        prompt_tab.setFocusResponseContent()
 
     def loadExampleFileDirectly(self, file_path):
         # get example tab
